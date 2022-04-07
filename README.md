@@ -1,7 +1,9 @@
 
-# upload-customs-documents-test-harness-frontend
+# Upload Customs Documents Test Harness Frontend
 
-This is a placeholder README.md for a new repository
+This repository provides a wrapper (test harness) to the Upload Customs Documents Frontend µService.
+
+This repo has been created to simplify local testing of the service as well as to support automated user journey flows via a Journey Test pack.
 
 ### License
 

@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package config
+package connectors.mocks
 
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import org.scalamock.scalatest.MockFactory
+import play.api.libs.json.Writes
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
 
-import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig) {
+trait MockHttp extends MockFactory {
 
-  val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
+  val mockHttp: HttpClient = mock[HttpClient]
 
-  val uploadCustomsDocumentsUrl: String = servicesConfig.baseUrl("upload-customs-documents-frontend")
-
+  def setupMockHttpPost[I, O](url: String, model: I)(response: O): Unit = {
+    (mockHttp.POST(_: String, _: I, _: Seq[(String, String)])(_: Writes[I],_: HttpReads[O], _: HeaderCarrier, _: ExecutionContext))
+      .expects(url, model, *, *, *, *, *)
+      .returns(Future.successful(response))
+  }
 }

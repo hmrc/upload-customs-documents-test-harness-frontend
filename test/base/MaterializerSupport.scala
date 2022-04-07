@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package config
+package base
 
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import akka.actor.ActorSystem
+import akka.stream.Materializer
 
-import javax.inject.{Inject, Singleton}
-
-@Singleton
-class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig) {
-
-  val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
-
-  val uploadCustomsDocumentsUrl: String = servicesConfig.baseUrl("upload-customs-documents-frontend")
-
+trait MaterializerSupport {
+  implicit val system = ActorSystem("Sys")
+  implicit val materializer = Materializer(system)
 }

@@ -26,6 +26,9 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig)
 
   val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
 
-  val uploadCustomsDocumentsUrl: String = servicesConfig.baseUrl("upload-customs-documents-frontend")
+  val host = servicesConfig.getString("host")
 
+  val uploadCustomsDocumentsDNS: String = servicesConfig.baseUrl("upload-customs-documents-frontend")
+  val uploadCustomsDocumentsUrl: String = servicesConfig.getString("upload-customs-documents-frontend.url")
+  def authStubUrl: String = servicesConfig.getString("auth-stub.url") + "?continue=" + host + controllers.routes.InitialisationController.intialiseParams.url
 }

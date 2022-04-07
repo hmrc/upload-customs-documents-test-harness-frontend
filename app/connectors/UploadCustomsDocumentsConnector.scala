@@ -31,10 +31,10 @@ class UploadCustomsDocumentsConnector @Inject()(httpClient: HttpClient, implicit
   //TODO: Pass through a model representing all the configurable parameters
   def initialize(configuration: JsValue)
                 (implicit hc: HeaderCarrier, ec: ExecutionContext, messages: MessagesApi): Future[UploadCustomsDocumentsInitializationResponse] = {
-    logger.debug(s"URL: ${appConfig.uploadCustomsDocumentsUrl}, Body: \n\n${Json.toJson(configuration)}")
-    httpClient.POST(
-      url = appConfig.uploadCustomsDocumentsUrl,
-      body = configuration
-    )(implicitly, UploadCustomsDocumentsInitializationReads, hc, ec)
+
+    val url = appConfig.uploadCustomsDocumentsDNS + "/internal/initialize"
+    logger.debug(s"URL: $url, Body: \n\n${Json.toJson(configuration)}")
+
+    httpClient.POST(url, configuration)(implicitly, UploadCustomsDocumentsInitializationReads, hc, ec)
   }
 }

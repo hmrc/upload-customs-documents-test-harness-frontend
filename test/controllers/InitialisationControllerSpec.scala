@@ -16,21 +16,25 @@
 
 package controllers
 
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import views.html.HelloWorldPage
+import base.GuicySpec
+import play.api.http.Status
+import play.api.test.Helpers._
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+class InitialisationControllerSpec extends GuicySpec {
 
-@Singleton
-class HelloWorldController @Inject()(
-  mcc: MessagesControllerComponents,
-  helloWorldPage: HelloWorldPage)
-    extends FrontendController(mcc) {
+  private val controller = app.injector.instanceOf[InitialisationController]
 
-  val helloWorld: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(helloWorldPage()))
+  "GET /" should {
+
+    "return 200" in {
+      val result = controller.intialiseParams(fakeRequest)
+      status(result) mustBe Status.OK
+    }
+
+    "return HTML" in {
+      val result = controller.intialiseParams(fakeRequest)
+      contentType(result) mustBe Some("text/html")
+      charset(result)     mustBe Some("utf-8")
+    }
   }
-
 }

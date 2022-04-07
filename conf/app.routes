@@ -1,5 +1,6 @@
 # microservice specific routes
 
 ->         /hmrc-frontend           hmrcfrontend.Routes
-GET        /                        controllers.HelloWorldController.helloWorld
+GET        /                        controllers.InitialisationController.intialiseParams
+POST       /                        controllers.InitialisationController.postInitialisation
 GET        /assets/*file            controllers.Assets.versioned(path = "/public", file: Asset)

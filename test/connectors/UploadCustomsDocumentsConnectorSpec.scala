@@ -36,7 +36,7 @@ class UploadCustomsDocumentsConnectorSpec extends GuicySpec with MockHttp {
 
         "return a Right(ValidClaimPeriodModel)" in {
 
-          setupMockHttpPost(appConfig.uploadCustomsDocumentsUrl, dummyJson)(Right(locationHeaderUrl))
+          setupMockHttpPost(appConfig.uploadCustomsDocumentsDNS + "/internal/initialize", dummyJson)(Right(locationHeaderUrl))
 
           val expectedResult = Right(locationHeaderUrl)
           val actualResult = TestUploadCustomsDocumentsConnector.initialize(dummyJson)(hc, ec, messagesApi)
@@ -49,7 +49,7 @@ class UploadCustomsDocumentsConnectorSpec extends GuicySpec with MockHttp {
 
         "return a Left(Invalid)" in {
 
-          setupMockHttpPost(appConfig.uploadCustomsDocumentsUrl, dummyJson)(Left(NoLocationHeaderReturned))
+          setupMockHttpPost(appConfig.uploadCustomsDocumentsDNS + "/internal/initialize", dummyJson)(Left(NoLocationHeaderReturned))
 
           val expectedResult = Left(NoLocationHeaderReturned)
           val actualResult = TestUploadCustomsDocumentsConnector.initialize(dummyJson)(hc, ec, messagesApi)

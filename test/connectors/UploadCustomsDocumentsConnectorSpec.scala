@@ -34,7 +34,7 @@ class UploadCustomsDocumentsConnectorSpec extends GuicySpec with MockHttp {
 
       "for a successful response" must {
 
-        "return a Right(ValidClaimPeriodModel)" in {
+        "return a Right(locationHeaderUrl)" in {
 
           setupMockHttpPost(appConfig.uploadCustomsDocumentsUrl, dummyJson)(Right(locationHeaderUrl))
 

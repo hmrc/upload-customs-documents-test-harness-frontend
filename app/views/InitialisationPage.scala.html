@@ -36,10 +36,8 @@
   </p>
 
   <h2 class="govuk-heading-m">@{messages("initialise.h2.step2")}</h2>
-  <p class="govuk-body">Supply Initilisation Request JSON</p>
-
   @formHelper(action = postAction) {
-    @textArea(form, "json", "initialise.json.label")
+    @textArea(form, "json", "initialise.json.label", rows = 20)
     @button("site.submit")
   }
 }

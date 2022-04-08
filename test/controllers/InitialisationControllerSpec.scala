@@ -17,24 +17,80 @@
 package controllers
 
 import base.GuicySpec
+import connectors.httpParsers.UploadCustomsDocumentsInitializationHttpParser.NoLocationHeaderReturned
+import connectors.mocks.MockUploadDocumentsConnector
+import forms.UploadCustomsDocumentInitialisationFormProvider
 import play.api.http.Status
+import play.api.libs.json.Json
+import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
+import views.html.InitialisationPage
 
-class InitialisationControllerSpec extends GuicySpec {
+import scala.concurrent.Future
 
-  private val controller = app.injector.instanceOf[InitialisationController]
+class InitialisationControllerSpec extends GuicySpec with MockUploadDocumentsConnector {
 
-  "GET /" should {
+  lazy val view = app.injector.instanceOf[InitialisationPage]
+  lazy val form = app.injector.instanceOf[UploadCustomsDocumentInitialisationFormProvider]
+  lazy val mcc = app.injector.instanceOf[MessagesControllerComponents]
+
+  object TestController extends InitialisationController(
+    mcc,
+    view,
+    form,
+    mockUploadCustomsDocumentsConnector
+  )
+
+  "calling .intialiseParams" should {
 
     "return 200" in {
-      val result = controller.intialiseParams(fakeRequest)
+      val result = TestController.intialiseParams(fakeRequest)
       status(result) mustBe Status.OK
     }
 
     "return HTML" in {
-      val result = controller.intialiseParams(fakeRequest)
+      val result = TestController.intialiseParams(fakeRequest)
       contentType(result) mustBe Some("text/html")
       charset(result)     mustBe Some("utf-8")
+    }
+  }
+
+  "calling .postInitialisation" when {
+
+    "form does not contain valid JSON" must {
+
+      "return 400" in {
+        val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> ""))
+        status(result) mustBe Status.BAD_REQUEST
+      }
+    }
+
+    "form contains valid JSON" when {
+
+      "response from connector is Right(redirectUrl)" must {
+
+        "return 303" in {
+
+          mockInitialise(Json.obj())(Future(Right("/foo")))
+
+          val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}"))
+
+          status(result) mustBe Status.SEE_OTHER
+          redirectLocation(result) mustBe Some(appConfig.uploadCustomsDocumentsUrl + "/foo")
+        }
+      }
+
+      "response from connector is Left(_)" must {
+
+        "return ISE" in {
+
+          mockInitialise(Json.obj())(Future(Left(NoLocationHeaderReturned)))
+
+          val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}"))
+
+          status(result) mustBe Status.INTERNAL_SERVER_ERROR
+        }
+      }
     }
   }
 }

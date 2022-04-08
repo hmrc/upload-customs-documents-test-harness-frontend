@@ -27,7 +27,7 @@ import scala.util.Try
 
 class UploadCustomsDocumentInitialisationFormProvider @Inject()() {
 
-  val isJson: Constraint[String] = Constraint("site.isJson")({ plainText =>
+  val isJson: Constraint[String] = Constraint("isJson")({ plainText =>
     if (Try(Json.parse(plainText)).isSuccess) Valid else Invalid("Not Valid JSON!")
   })
 

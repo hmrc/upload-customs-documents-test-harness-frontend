@@ -20,16 +20,19 @@
 
 @this(
         appConfig: AppConfig,
-        hmrcLayout: HmrcLayout
+        hmrcLayout: HmrcLayout,
+        fullWidth: components.fullWidthContent
 )
 @(pageTitle: Option[String] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
 @hmrcLayout(
     pageTitle = pageTitle,
     nonce = CSPNonce.get,
-    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
+    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled,
+    mainContentLayout = Some(fullWidth(_))
 )(contentBlock)
 
 @{
     //$COVERAGE-OFF$
 }
+

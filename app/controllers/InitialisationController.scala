@@ -20,8 +20,10 @@ import config.AppConfig
 import connectors.UploadCustomsDocumentsConnector
 import forms.UploadCustomsDocumentInitialisationFormProvider
 import play.api.data.Form
+import play.api.http.HeaderNames
 import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.i18n.MessagesApi
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.InitialisationPage
@@ -49,9 +51,10 @@ class InitialisationController @Inject()(mcc: MessagesControllerComponents,
       formWithErrors =>
         Future.successful(BadRequest(renderView(formWithErrors))),
       intialisationModel => {
-        uploadCustomsDocumentsConnector.initialize(intialisationModel.json).map {
+        uploadCustomsDocumentsConnector.initialize(intialisationModel).map {
           case Left(_) => InternalServerError
-          case Right(redirect) => Redirect(appConfig.uploadCustomsDocumentsUrl + redirect)
+          case Right(redirect) =>
+            Redirect(appConfig.uploadCustomsDocumentsUrl + redirect)
         }
       }
     )

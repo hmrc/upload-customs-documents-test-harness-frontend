@@ -18,6 +18,8 @@ package connectors
 
 import config.AppConfig
 import connectors.httpParsers.UploadCustomsDocumentsInitializationHttpParser.{UploadCustomsDocumentsInitializationReads, UploadCustomsDocumentsInitializationResponse}
+import models.InitialisationModel
+import play.api.http.HeaderNames
 import play.api.i18n.MessagesApi
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
@@ -29,12 +31,16 @@ import scala.concurrent.{ExecutionContext, Future}
 class UploadCustomsDocumentsConnector @Inject()(httpClient: HttpClient, implicit val appConfig: AppConfig) extends LoggerUtil {
 
   //TODO: Pass through a model representing all the configurable parameters
-  def initialize(configuration: JsValue)
+  def initialize(configuration: InitialisationModel)
                 (implicit hc: HeaderCarrier, ec: ExecutionContext, messages: MessagesApi): Future[UploadCustomsDocumentsInitializationResponse] = {
 
     val url = appConfig.uploadCustomsDocumentsDNS + "/internal/initialize"
-    logger.debug(s"URL: $url, Body: \n\n${Json.toJson(configuration)}")
+    logger.debug(s"URL: $url, Body: \n\n${configuration.json}")
 
-    httpClient.POST(url, configuration)(implicitly, UploadCustomsDocumentsInitializationReads, hc, ec)
+    httpClient.POST(
+      url = url,
+      body = configuration.json,
+      headers = Seq(HeaderNames.USER_AGENT -> configuration.userAgent)
+    )(implicitly, UploadCustomsDocumentsInitializationReads, hc, ec)
   }
 }

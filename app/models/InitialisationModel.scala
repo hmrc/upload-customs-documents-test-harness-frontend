@@ -19,4 +19,4 @@ package models
 import play.api.libs.json.JsValue
 
 //TODO: Change this to reflect the individual configurable options?
-case class InitialisationModel(json: JsValue)
+case class InitialisationModel(json: JsValue, userAgent: String)

@@ -34,6 +34,7 @@ class UploadCustomsDocumentInitialisationFormProvider @Inject()() {
   def apply(): Form[InitialisationModel] =
     Form(mapping(
       "json" -> text.verifying(isJson)
-        .transform[JsValue](Json.parse, _.toString)
+        .transform[JsValue](Json.parse, _.toString),
+      "userAgent" -> nonEmptyText
     )(InitialisationModel.apply)(InitialisationModel.unapply))
 }

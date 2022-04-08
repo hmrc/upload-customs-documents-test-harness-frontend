@@ -20,6 +20,7 @@ import base.GuicySpec
 import connectors.httpParsers.UploadCustomsDocumentsInitializationHttpParser.NoLocationHeaderReturned
 import connectors.mocks.MockUploadDocumentsConnector
 import forms.UploadCustomsDocumentInitialisationFormProvider
+import models.InitialisationModel
 import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.mvc.MessagesControllerComponents
@@ -60,7 +61,15 @@ class InitialisationControllerSpec extends GuicySpec with MockUploadDocumentsCon
     "form does not contain valid JSON" must {
 
       "return 400" in {
-        val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> ""))
+        val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "", "userAgent" -> "foo"))
+        status(result) mustBe Status.BAD_REQUEST
+      }
+    }
+
+    "form does not contain userAgent" must {
+
+      "return 400" in {
+        val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}"))
         status(result) mustBe Status.BAD_REQUEST
       }
     }
@@ -71,9 +80,9 @@ class InitialisationControllerSpec extends GuicySpec with MockUploadDocumentsCon
 
         "return 303" in {
 
-          mockInitialise(Json.obj())(Future(Right("/foo")))
+          mockInitialise(InitialisationModel(Json.obj(), "foo"))(Future(Right("/foo")))
 
-          val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}"))
+          val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}", "userAgent" -> "foo"))
 
           status(result) mustBe Status.SEE_OTHER
           redirectLocation(result) mustBe Some(appConfig.uploadCustomsDocumentsUrl + "/foo")
@@ -84,9 +93,9 @@ class InitialisationControllerSpec extends GuicySpec with MockUploadDocumentsCon
 
         "return ISE" in {
 
-          mockInitialise(Json.obj())(Future(Left(NoLocationHeaderReturned)))
+          mockInitialise(InitialisationModel(Json.obj(), "foo"))(Future(Left(NoLocationHeaderReturned)))
 
-          val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}"))
+          val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}", "userAgent" -> "foo"))
 
           status(result) mustBe Status.INTERNAL_SERVER_ERROR
         }

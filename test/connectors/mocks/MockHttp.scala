@@ -26,9 +26,9 @@ trait MockHttp extends MockFactory {
 
   val mockHttp: HttpClient = mock[HttpClient]
 
-  def setupMockHttpPost[I, O](url: String, model: I)(response: O): Unit = {
+  def setupMockHttpPost[I, O](url: String, model: I, headers: Seq[(String, String)])(response: O): Unit = {
     (mockHttp.POST(_: String, _: I, _: Seq[(String, String)])(_: Writes[I],_: HttpReads[O], _: HeaderCarrier, _: ExecutionContext))
-      .expects(url, model, *, *, *, *, *)
+      .expects(url, model, headers, *, *, *, *)
       .returns(Future.successful(response))
   }
 }

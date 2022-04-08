@@ -33,7 +33,6 @@ class InitialisationControllerSpec extends GuicySpec with MockUploadDocumentsCon
 
   lazy val view = app.injector.instanceOf[InitialisationPage]
   lazy val form = app.injector.instanceOf[UploadCustomsDocumentInitialisationFormProvider]
-  lazy val mcc = app.injector.instanceOf[MessagesControllerComponents]
 
   object TestController extends InitialisationController(
     mcc,

@@ -16,28 +16,18 @@
 
 package controllers
 
-import akka.stream.Materializer
+import base.GuicySpec
 import controllers.internal.UploadedFilesCallbackController
 import models.{UploadedFile, UploadedFilesCallback}
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
 import java.time.{Instant, ZoneId, ZonedDateTime}
 
-class UploadedFilesCallbackControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
-  override def fakeApplication(): Application =
-    new GuiceApplicationBuilder()
-      .configure("metrics.jvm" -> false, "metrics.enabled" -> false)
-      .build()
-  implicit val materializer: Materializer = app.materializer
+class UploadedFilesCallbackControllerSpec extends GuicySpec {
 
-  private val controller = app.injector.instanceOf[UploadedFilesCallbackController]
+  object TestController extends UploadedFilesCallbackController(mcc)
 
   val callbackPayload: UploadedFilesCallback =
     UploadedFilesCallback(
@@ -46,7 +36,7 @@ class UploadedFilesCallbackControllerSpec extends AnyWordSpec with Matchers with
       cargo = None
     )
 
-  def uploadDocument(id: String = "foo") = UploadedFile(
+  def uploadDocument(id: String = "pdf"): UploadedFile = UploadedFile(
     upscanReference = s"upscan-reference-$id",
     fileName = s"file-name-$id",
     downloadUrl = s"download-url-$id",
@@ -57,13 +47,13 @@ class UploadedFilesCallbackControllerSpec extends AnyWordSpec with Matchers with
   )
   "POST /" should {
     "return 204 if callback accepted" in {
-      val result = controller.post(FakeRequest().withJsonBody(Json.toJson(callbackPayload)))
-      status(result) shouldBe 204
+      val result = TestController.post()(FakeRequest("Post", "/").withBody(Json.toJson(callbackPayload)))
+      status(result) mustBe 204
     }
 
     "return 400 if callback rejected because of invalid request" in {
-      val result = controller.post(FakeRequest().withJsonBody(Json.parse("""{"foo":"bar"}""")))
-      status(result) shouldBe 400
+      val result = TestController.post()(FakeRequest("Post", "/").withBody(Json.parse("""{"foo":"bar"}""")))
+      status(result) mustBe 400
     }
   }
 }

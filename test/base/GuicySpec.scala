@@ -36,7 +36,7 @@ trait GuicySpec extends SpecBase with GuiceOneAppPerSuite {
 
   implicit lazy val appConfig: AppConfig = injector.instanceOf[AppConfig]
   implicit lazy val ec: ExecutionContext = injector.instanceOf[ExecutionContext]
-  lazy val messagesControllerComponents: MessagesControllerComponents = injector.instanceOf[MessagesControllerComponents]
+  lazy val mcc: MessagesControllerComponents = injector.instanceOf[MessagesControllerComponents]
   implicit lazy val messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
   implicit lazy val messages: Messages = messagesApi.preferred(fakeRequest)
 }

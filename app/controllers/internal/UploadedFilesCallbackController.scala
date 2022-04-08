@@ -18,9 +18,10 @@ package controllers.internal
 
 import config.AppConfig
 import models.UploadedFilesCallback
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import utils.LoggerUtil
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,11 +30,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class UploadedFilesCallbackController @Inject() (mcc: MessagesControllerComponents)(implicit
   val ec: ExecutionContext,
   val appConfig: AppConfig
-) extends FrontendController(mcc) {
+) extends FrontendController(mcc) with LoggerUtil {
 
-  // {"nonce":12345,"uploadedFiles":[{"upscanReference":"upscan-reference-pdf","downloadUrl":"download-url-pdf","uploadTimestamp":"1970-01-01T01:00:00+01:00[Europe/London]","checksum":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","fileName":"file-name-pdf","fileMimeType":"application/pdf","fileSize":12345}]}
   val post: Action[JsValue] = Action.async(parse.tolerantJson) { implicit request =>
     withJsonBody[UploadedFilesCallback] { uploadedFilesCallback =>
+      logger.debug(s"UploadedFiles Body: \n\n${Json.toJson(uploadedFilesCallback)}")
       Future.successful(NoContent)
     }
   }

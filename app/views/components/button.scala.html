@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,25 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package controllers
+@this(govukButton: GovukButton)
 
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import views.html.HelloWorldPage
+@(msg: String, idForButton: String = "button-1")(implicit messages: Messages)
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
-
-@Singleton
-class HelloWorldController @Inject()(
-  mcc: MessagesControllerComponents,
-  helloWorldPage: HelloWorldPage)
-    extends FrontendController(mcc) {
-
-  val helloWorld: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(helloWorldPage()))
-  }
-
-}
+@govukButton(
+    Button(
+        attributes = Map("id" -> idForButton),
+        content = Text(messages(msg)),
+        preventDoubleClick = true
+    )
+)

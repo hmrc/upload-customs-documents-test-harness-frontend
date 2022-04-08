@@ -28,6 +28,7 @@ object UploadCustomsDocumentsInitializationHttpParser extends LoggerUtil {
   implicit object UploadCustomsDocumentsInitializationReads extends HttpReads[UploadCustomsDocumentsInitializationResponse] {
 
     def read(method: String, url: String, response: HttpResponse): UploadCustomsDocumentsInitializationResponse = {
+      logger.debug(s"[read] response: ${response}")
       response.status match {
         case CREATED =>
           response.header(HeaderNames.LOCATION) match {

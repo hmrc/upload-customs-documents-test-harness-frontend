@@ -1,2 +1,9 @@
+site.submit = Submit
+
 service.name = Upload Customs Documents Test Harness Frontend
 service.text = Service to be used for providing a test harness into Upload Customs Documents Frontend
+
+initialise.h1 = Upload Customs Documents Test Harness
+initialise.h2.step1 = Step 1: Auth
+initialise.h2.step2 = Step 2: Config
+initialise.json.label = Supply Initialisation JSON with configurable messages to test.

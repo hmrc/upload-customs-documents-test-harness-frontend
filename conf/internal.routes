@@ -1,0 +1,3 @@
+# microservice specific routes
+
+POST       /receive-file-uploads    controllers.internal.UploadedFilesCallbackController.post

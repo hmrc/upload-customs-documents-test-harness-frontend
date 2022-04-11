@@ -31,4 +31,9 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig)
   val uploadCustomsDocumentsDNS: String = servicesConfig.baseUrl("upload-customs-documents-frontend")
   val uploadCustomsDocumentsUrl: String = servicesConfig.getString("upload-customs-documents-frontend.url")
   def authStubUrl: String = servicesConfig.getString("auth-stub.url") + "?continue=" + host + controllers.routes.InitialisationController.intialiseParams.url
+
+  //Initialisation Defaults
+  def backLinkUrl = host + controllers.routes.InitialisationController.intialiseParams.url
+  def continueUrl = host + controllers.routes.InitialisationController.intialiseParams.url //TODO: Change to be continue route
+  def callbackDNSRoute = servicesConfig.baseUrl("upload-customs-documents-test-harness-frontend") + controllers.internal.routes.UploadedFilesCallbackController.post.url
 }

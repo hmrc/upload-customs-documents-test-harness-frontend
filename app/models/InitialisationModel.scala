@@ -16,7 +16,23 @@
 
 package models
 
-import play.api.libs.json.JsValue
+import config.AppConfig
+import play.api.libs.json.{JsObject, JsValue, Json}
 
 //TODO: Change this to reflect the individual configurable options?
 case class InitialisationModel(json: JsValue, userAgent: String)
+
+object InitialisationModel {
+
+  private def minimumJson()(implicit appConfig: AppConfig): JsObject = Json.obj(
+    "config" -> Json.obj(
+      "nonce" -> 12345,
+      "continueUrl" -> appConfig.continueUrl,
+      "backlinkUrl" -> appConfig.backLinkUrl,
+      "callbackUrl" -> appConfig.callbackDNSRoute
+    )
+  )
+
+  def defaultConfig()(implicit appConfig: AppConfig): InitialisationModel =
+    InitialisationModel(minimumJson(), "")
+}

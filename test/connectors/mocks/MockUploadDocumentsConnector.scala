@@ -18,6 +18,7 @@ package connectors.mocks
 
 import connectors.UploadCustomsDocumentsConnector
 import connectors.httpParsers.UploadCustomsDocumentsInitializationHttpParser.UploadCustomsDocumentsInitializationResponse
+import models.InitialisationModel
 import org.scalamock.scalatest.MockFactory
 import play.api.i18n.MessagesApi
 import play.api.libs.json.JsValue
@@ -29,8 +30,8 @@ trait MockUploadDocumentsConnector extends MockFactory {
 
   val mockUploadCustomsDocumentsConnector: UploadCustomsDocumentsConnector = mock[UploadCustomsDocumentsConnector]
 
-  def mockInitialise(config: JsValue)(response: Future[UploadCustomsDocumentsInitializationResponse]): Unit = {
-    (mockUploadCustomsDocumentsConnector.initialize(_: JsValue)(_: HeaderCarrier, _: ExecutionContext, _: MessagesApi))
+  def mockInitialise(config: InitialisationModel)(response: Future[UploadCustomsDocumentsInitializationResponse]): Unit = {
+    (mockUploadCustomsDocumentsConnector.initialize(_: InitialisationModel)(_: HeaderCarrier, _: ExecutionContext, _: MessagesApi))
       .expects(config, *, *, *)
       .returns(response)
   }

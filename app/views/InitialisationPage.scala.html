@@ -21,6 +21,7 @@
         formHelper: FormWithCSRF,
         button: components.button,
         textArea: components.textArea,
+        textField: components.inputText,
         errorSummary: components.errorSummary
 )
 @(postAction: Call, form: Form[_])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
@@ -37,6 +38,7 @@
 
   <h2 class="govuk-heading-m">@{messages("initialise.h2.step2")}</h2>
   @formHelper(action = postAction) {
+    @textField(form, "userAgent", "userAgent", "initialise.userAgent.label", isPageHeading = false)
     @textArea(form, "json", "initialise.json.label", rows = 20)
     @button("site.submit")
   }

@@ -7,3 +7,4 @@ initialise.h1 = Upload Customs Documents Test Harness
 initialise.h2.step1 = Step 1: Auth
 initialise.h2.step2 = Step 2: Config
 initialise.json.label = Supply Initialisation JSON with configurable messages to test.
+initialise.userAgent.label = User-Agent to 'spoof' as

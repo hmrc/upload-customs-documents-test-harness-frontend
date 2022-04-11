@@ -19,12 +19,14 @@ package connectors
 import base.GuicySpec
 import connectors.httpParsers.UploadCustomsDocumentsInitializationHttpParser.NoLocationHeaderReturned
 import connectors.mocks.MockHttp
+import models.InitialisationModel
+import play.api.http.HeaderNames
 import play.api.libs.json.Json
 
 class UploadCustomsDocumentsConnectorSpec extends GuicySpec with MockHttp {
 
   val locationHeaderUrl = "/foo"
-  val dummyJson = Json.obj("foo" -> "bar")
+  val initModel = InitialisationModel(Json.obj("foo" -> "bar"), "foo-bar-agent")
 
   object TestUploadCustomsDocumentsConnector extends UploadCustomsDocumentsConnector(mockHttp, appConfig)
 
@@ -36,10 +38,14 @@ class UploadCustomsDocumentsConnectorSpec extends GuicySpec with MockHttp {
 
         "return a Right(locationHeaderUrl)" in {
 
-          setupMockHttpPost(appConfig.uploadCustomsDocumentsDNS + "/internal/initialize", dummyJson)(Right(locationHeaderUrl))
+          setupMockHttpPost(
+            url = appConfig.uploadCustomsDocumentsDNS + "/internal/initialize",
+            model = initModel.json,
+            headers = Seq(HeaderNames.USER_AGENT -> initModel.userAgent)
+          )(Right(locationHeaderUrl))
 
           val expectedResult = Right(locationHeaderUrl)
-          val actualResult = TestUploadCustomsDocumentsConnector.initialize(dummyJson)(hc, ec, messagesApi)
+          val actualResult = TestUploadCustomsDocumentsConnector.initialize(initModel)(hc, ec, messagesApi)
 
           await(actualResult) mustBe expectedResult
         }
@@ -49,10 +55,14 @@ class UploadCustomsDocumentsConnectorSpec extends GuicySpec with MockHttp {
 
         "return a Left(Invalid)" in {
 
-          setupMockHttpPost(appConfig.uploadCustomsDocumentsDNS + "/internal/initialize", dummyJson)(Left(NoLocationHeaderReturned))
+          setupMockHttpPost(
+            url = appConfig.uploadCustomsDocumentsDNS + "/internal/initialize",
+            model = initModel.json,
+            headers = Seq(HeaderNames.USER_AGENT -> initModel.userAgent)
+          )(Left(NoLocationHeaderReturned))
 
           val expectedResult = Left(NoLocationHeaderReturned)
-          val actualResult = TestUploadCustomsDocumentsConnector.initialize(dummyJson)(hc, ec, messagesApi)
+          val actualResult = TestUploadCustomsDocumentsConnector.initialize(initModel)(hc, ec, messagesApi)
 
           await(actualResult) mustBe expectedResult
         }

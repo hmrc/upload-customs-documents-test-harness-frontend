@@ -20,6 +20,7 @@ import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.duration.Duration
 
 @Singleton
 class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig) {
@@ -33,7 +34,8 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig)
   def authStubUrl: String = servicesConfig.getString("auth-stub.url") + "?continue=" + host + controllers.routes.InitialisationController.intialiseParams.url
 
   //Initialisation Defaults
-  def backLinkUrl = host + controllers.routes.InitialisationController.intialiseParams.url
-  def continueUrl = host + controllers.routes.InitialisationController.intialiseParams.url //TODO: Change to be continue route
-  def callbackDNSRoute = servicesConfig.baseUrl("upload-customs-documents-test-harness-frontend") + controllers.internal.routes.UploadedFilesCallbackController.post.url
+  def backLinkUrl: String = host + controllers.routes.InitialisationController.intialiseParams.url
+  def continueUrl(nonce: Int): String = host + controllers.routes.UploadedFilesController.listFiles(nonce).url
+  def callbackDNSRoute: String = servicesConfig.baseUrl("upload-customs-documents-test-harness-frontend") + controllers.internal.routes.UploadedFilesCallbackController.post.url
+  val defaultUserAgent: String = servicesConfig.getString("defaultUserAgent")
 }

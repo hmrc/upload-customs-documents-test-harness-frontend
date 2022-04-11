@@ -27,12 +27,12 @@ object InitialisationModel {
   private def minimumJson()(implicit appConfig: AppConfig): JsObject = Json.obj(
     "config" -> Json.obj(
       "nonce" -> 12345,
-      "continueUrl" -> appConfig.continueUrl,
+      "continueUrl" -> appConfig.continueUrl(12345),
       "backlinkUrl" -> appConfig.backLinkUrl,
       "callbackUrl" -> appConfig.callbackDNSRoute
     )
   )
 
   def defaultConfig()(implicit appConfig: AppConfig): InitialisationModel =
-    InitialisationModel(minimumJson(), "")
+    InitialisationModel(minimumJson(), appConfig.defaultUserAgent)
 }

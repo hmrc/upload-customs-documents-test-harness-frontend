@@ -20,6 +20,7 @@ import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.duration.Duration
 
 @Singleton
 class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig) {
@@ -34,6 +35,8 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig)
 
   //Initialisation Defaults
   def backLinkUrl = host + controllers.routes.InitialisationController.intialiseParams.url
-  def continueUrl = host + controllers.routes.InitialisationController.intialiseParams.url //TODO: Change to be continue route
+  def continueUrl(nonce: Int) = host + controllers.routes.UploadedFilesController.listFiles(nonce).url
   def callbackDNSRoute = servicesConfig.baseUrl("upload-customs-documents-test-harness-frontend") + controllers.internal.routes.UploadedFilesCallbackController.post.url
+
+  val cacheTtl: Duration = Duration(config.get[String]("mongodb.ttl"))
 }

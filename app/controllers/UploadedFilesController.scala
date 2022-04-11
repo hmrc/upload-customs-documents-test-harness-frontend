@@ -40,9 +40,9 @@ class UploadedFilesController @Inject()(mcc: MessagesControllerComponents,
 
   def listFiles(nonce: Int): Action[AnyContent] = Action.async { implicit request =>
     uploadedFilesRepo.getRecord(nonce).map { oUploadedFiles =>
-      val files = oUploadedFiles.fold[Seq[UploadedFile]](Seq())(x => x.uploadedFiles)
-      logger.info(s"[listFiles] Mongo Record files: $files")
-      Ok(view(files))
+      val files = oUploadedFiles.fold[Seq[UploadedFile]](Seq())(_.uploadedFiles)
+      logger.info(s"[listFiles] Mongo Record: $oUploadedFiles")
+      Ok(view(files, oUploadedFiles.isDefined))
     }
   }
 }

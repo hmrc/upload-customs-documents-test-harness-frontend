@@ -34,9 +34,8 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig)
   def authStubUrl: String = servicesConfig.getString("auth-stub.url") + "?continue=" + host + controllers.routes.InitialisationController.intialiseParams.url
 
   //Initialisation Defaults
-  def backLinkUrl = host + controllers.routes.InitialisationController.intialiseParams.url
-  def continueUrl(nonce: Int) = host + controllers.routes.UploadedFilesController.listFiles(nonce).url
-  def callbackDNSRoute = servicesConfig.baseUrl("upload-customs-documents-test-harness-frontend") + controllers.internal.routes.UploadedFilesCallbackController.post.url
-
-  val cacheTtl: Duration = Duration(config.get[String]("mongodb.ttl"))
+  def backLinkUrl: String = host + controllers.routes.InitialisationController.intialiseParams.url
+  def continueUrl(nonce: Int): String = host + controllers.routes.UploadedFilesController.listFiles(nonce).url
+  def callbackDNSRoute: String = servicesConfig.baseUrl("upload-customs-documents-test-harness-frontend") + controllers.internal.routes.UploadedFilesCallbackController.post.url
+  val defaultUserAgent: String = servicesConfig.getString("defaultUserAgent")
 }

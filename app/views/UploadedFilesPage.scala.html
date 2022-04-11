@@ -20,25 +20,36 @@
         layout: Layout
 )
 
-@(files: Seq[UploadedFile])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(files: Seq[UploadedFile], recordExisted: Boolean)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @layout(pageTitle = Some(messages("service.name"))) {
 
-  <h1 class="govuk-heading-l">@{messages("uploadedFiles.h1")}</h1>
+    <h1 class="govuk-heading-l">@{messages("uploadedFiles.h1")}</h1>
 
-  @files.zipWithIndex.map { case (file, i) =>
-      <h2 class="govuk-heading-m">File @i: @file.fileName</h2>
-    <ul class="govuk-list govuk-list--bullet">
-        <li><strong>Upscan Reference:</strong> @file.upscanReference</li>
-        <li><strong>Download URL:</strong> @file.downloadUrl</li>
-        <li><strong>UploadedTS:</strong> @file.uploadTimestamp</li>
-        <li><strong>Checksum:</strong> @file.checksum</li>
-        <li><strong>MimeType:</strong> @file.fileMimeType</li>
-        <li><strong>FileSzie:</strong> @file.fileSize</li>
-        <li><strong>Cargo:</strong> @file.cargo</li>
-        <li><strong>Description:</strong> @file.description</li>
-    </ul>
-  }
+    @if(!recordExisted) {
+
+        <p class="govuk-body">No Record was found for the supplied Nonce value</p>
+
+    } else {
+
+       @files.zipWithIndex.map { case (file, i) =>
+           <h2 id="file@{i+1}" class="govuk-heading-m">File @{i+1}: <a href="@file.downloadUrl">@file.fileName</a></h2>
+           <ul class="govuk-list govuk-list--bullet">
+               <li><strong>Upscan Reference:</strong> @file.upscanReference</li>
+               <li><strong>Download URL:</strong> <a href="@file.downloadUrl">@file.downloadUrl</a></li>
+               <li><strong>UploadedTS:</strong> @file.uploadTimestamp</li>
+               <li><strong>Checksum:</strong> @file.checksum</li>
+               <li><strong>MimeType:</strong> @file.fileMimeType</li>
+               <li><strong>FileSzie:</strong> @file.fileSize</li>
+               @file.cargo.map { cargo =>
+                   <li><strong>Cargo:</strong> @cargo</li>
+               }
+               @file.description.map { desc =>
+                   <li><strong>Description:</strong> @desc</li>
+               }
+           </ul>
+       }
+   }
 }
 
 @{

@@ -34,5 +34,5 @@ object InitialisationModel {
   )
 
   def defaultConfig()(implicit appConfig: AppConfig): InitialisationModel =
-    InitialisationModel(minimumJson(), "")
+    InitialisationModel(minimumJson(), appConfig.defaultUserAgent)
 }

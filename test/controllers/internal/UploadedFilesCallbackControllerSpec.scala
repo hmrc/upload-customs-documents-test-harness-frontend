@@ -14,24 +14,29 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.internal
 
 import base.GuicySpec
-import controllers.internal.UploadedFilesCallbackController
 import models.{UploadedFile, UploadedFilesCallback}
+import org.scalatest.BeforeAndAfterEach
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import repositories.UploadedFilesResponseRepo
 
 import java.time.{Instant, ZoneId, ZonedDateTime}
 
-class UploadedFilesCallbackControllerSpec extends GuicySpec {
+class UploadedFilesCallbackControllerSpec extends GuicySpec with BeforeAndAfterEach {
 
-  object TestController extends UploadedFilesCallbackController(mcc)
+  val repo = app.injector.instanceOf[UploadedFilesResponseRepo]
+
+  object TestController extends UploadedFilesCallbackController(mcc, repo)
+
+  val nonce = 12345
 
   val callbackPayload: UploadedFilesCallback =
     UploadedFilesCallback(
-      nonce = 12345,
+      nonce = nonce,
       uploadedFiles = Seq(uploadDocument()),
       cargo = None
     )
@@ -45,10 +50,14 @@ class UploadedFilesCallbackControllerSpec extends GuicySpec {
     fileMimeType = s"application/$id",
     fileSize = Some(12345)
   )
+
   "POST /" should {
-    "return 204 if callback accepted" in {
+
+    "return 204 if callback accepted AND update mongo" in {
       val result = TestController.post()(FakeRequest("Post", "/").withBody(Json.toJson(callbackPayload)))
       status(result) mustBe 204
+
+      await(repo.getRecord(nonce)) mustBe Some(callbackPayload)
     }
 
     "return 400 if callback rejected because of invalid request" in {

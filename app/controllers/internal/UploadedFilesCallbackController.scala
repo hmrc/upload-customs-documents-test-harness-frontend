@@ -20,6 +20,7 @@ import config.AppConfig
 import models.UploadedFilesCallback
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, MessagesControllerComponents}
+import repositories.UploadedFilesResponseRepo
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil
 
@@ -27,15 +28,17 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class UploadedFilesCallbackController @Inject() (mcc: MessagesControllerComponents)(implicit
-  val ec: ExecutionContext,
-  val appConfig: AppConfig
-) extends FrontendController(mcc) with LoggerUtil {
+class UploadedFilesCallbackController @Inject()(mcc: MessagesControllerComponents,
+                                                uploadedFilesResponseRepo: UploadedFilesResponseRepo)
+                                               (implicit val ec: ExecutionContext, val appConfig: AppConfig)
+  extends FrontendController(mcc) with LoggerUtil {
 
   val post: Action[JsValue] = Action.async(parse.tolerantJson) { implicit request =>
     withJsonBody[UploadedFilesCallback] { uploadedFilesCallback =>
       logger.debug(s"UploadedFiles Body: \n\n${Json.toJson(uploadedFilesCallback)}")
-      Future.successful(NoContent)
+      uploadedFilesResponseRepo.updateRecord(uploadedFilesCallback).map { _ =>
+        NoContent
+      }
     }
   }
 }

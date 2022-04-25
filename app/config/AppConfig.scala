@@ -26,7 +26,7 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig)
 
   val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
 
-  val host = servicesConfig.baseUrl("upload-customs-documents-test-harness-frontend")
+  val host = servicesConfig.getString("host")
 
   val uploadCustomsDocumentsDNS: String = servicesConfig.baseUrl("upload-customs-documents-frontend")
   val uploadDocumentsDNS: String = servicesConfig.baseUrl("upload-documents-frontend")
@@ -35,6 +35,6 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig)
   //Initialisation Defaults
   def backLinkUrl: String = host + controllers.routes.InitialisationController.intialiseParams.url
   def continueUrl(nonce: Int): String = host + controllers.routes.UploadedFilesController.listFiles(nonce).url
-  def callbackDNSRoute: String = host + controllers.internal.routes.UploadedFilesCallbackController.post.url
+  def callbackDNSRoute: String = servicesConfig.baseUrl("upload-customs-documents-test-harness-frontend") + controllers.internal.routes.UploadedFilesCallbackController.post.url
   val defaultUserAgent: String = servicesConfig.getString("defaultUserAgent")
 }

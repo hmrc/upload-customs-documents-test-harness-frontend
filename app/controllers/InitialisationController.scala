@@ -54,7 +54,10 @@ class InitialisationController @Inject() (
         initialisationModel =>
           uploadCustomsDocumentsConnector.initialize(initialisationModel).map {
             case Left(_)         => InternalServerError
-            case Right(redirect) => Redirect(initialisationModel.url + redirect)
+            case Right(redirect) =>
+              val host =
+                if(appConfig.hostDNS == appConfig.host) initialisationModel.url else appConfig.host
+              Redirect(host + redirect)
           }
       )
   }

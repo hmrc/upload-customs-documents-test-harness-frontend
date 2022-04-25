@@ -8,5 +8,8 @@ initialise.h2.step1 = Step 1: Auth
 initialise.h2.step2 = Step 2: Config
 initialise.json.label = Supply Initialisation JSON with configurable messages to test.
 initialise.userAgent.label = User-Agent to 'spoof' as
+initialise.url.label = File Upload Frontend
+initialise.url.upload-customs-documents = (NEW) upload-customs-documents
+initialise.url.upload-documents = (OLD) upload-documents
 
 uploadedFiles.h1 = Meta Data of Files Uploaded via Upscan

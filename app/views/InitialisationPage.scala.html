@@ -22,6 +22,7 @@
         button: components.button,
         textArea: components.textArea,
         textField: components.inputText,
+        govukRadios: GovukRadios,
         errorSummary: components.errorSummary
 )
 @(postAction: Call, form: Form[_])(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
@@ -38,6 +39,21 @@
 
   <h2 class="govuk-heading-m">@{messages("initialise.h2.step2")}</h2>
   @formHelper(action = postAction) {
+    @govukRadios(Radios(
+        items = Seq(
+            RadioItem(
+                content = Text(messages("initialise.url.upload-customs-documents")),
+                value = Some(appConfig.uploadCustomsDocumentsDNS),
+                checked = form("url").value.contains(appConfig.uploadCustomsDocumentsDNS)),
+            RadioItem(
+                content = Text(messages("initialise.url.upload-documents")),
+                value = Some(appConfig.uploadDocumentsDNS),
+                checked = form("url").value.contains(appConfig.uploadDocumentsDNS))
+        ),
+        name = "url",
+        fieldset = Some(Fieldset(legend = Some(Legend(content = Text(messages("initialise.url.label")))))),
+        classes = "govuk-radios--inline"
+    ))
     @textField(form, "userAgent", "userAgent", "initialise.userAgent.label", isPageHeading = false)
     @textArea(form, "json", "initialise.json.label", rows = 20)
     @button("site.submit")

@@ -21,6 +21,7 @@ import play.api.data.Forms._
 import play.api.data._
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import play.api.libs.json.{JsValue, Json}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
 
 import javax.inject.Inject
 import scala.util.Try
@@ -35,6 +36,7 @@ class UploadCustomsDocumentInitialisationFormProvider @Inject()() {
     Form(mapping(
       "json" -> text.verifying(isJson)
         .transform[JsValue](Json.parse, _.toString),
-      "userAgent" -> nonEmptyText
+      "userAgent" -> nonEmptyText,
+      "url" -> nonEmptyText
     )(InitialisationModel.apply)(InitialisationModel.unapply))
 }

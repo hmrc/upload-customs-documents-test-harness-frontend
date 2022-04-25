@@ -21,22 +21,18 @@ import org.scalatestplus.play.guice._
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.inject.{Injector, bind}
 import play.api.mvc.MessagesControllerComponents
+import play.api.test.Injecting
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import scala.concurrent.ExecutionContext
 
-trait GuicySpec extends SpecBase with GuiceOneAppPerSuite {
+trait GuicySpec extends SpecBase with GuiceOneAppPerSuite with Injecting {
 
   override lazy val app: Application = GuiceApplicationBuilder().build()
 
-  lazy val injector: Injector = app.injector
-
-  implicit lazy val appConfig: AppConfig = injector.instanceOf[AppConfig]
-  implicit lazy val ec: ExecutionContext = injector.instanceOf[ExecutionContext]
-  lazy val mcc: MessagesControllerComponents = injector.instanceOf[MessagesControllerComponents]
-  implicit lazy val messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
+  implicit lazy val appConfig: AppConfig = inject[AppConfig]
+  implicit lazy val ec: ExecutionContext = inject[ExecutionContext]
+  lazy val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
+  implicit lazy val messagesApi: MessagesApi = inject[MessagesApi]
   implicit lazy val messages: Messages = messagesApi.preferred(fakeRequest)
 }

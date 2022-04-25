@@ -56,7 +56,7 @@ class UploadedFilesResponseRepo @Inject()(mongo: MongoComponent)(implicit ec: Ex
 
   }
 
-  def getRecord(nonce: Int)(implicit ec: ExecutionContext): Future[Option[UploadedFilesCallback]] = {
+  def getRecord(nonce: Int): Future[Option[UploadedFilesCallback]] = {
     val selector = equal("nonce", nonce)
     collection
       .find(selector)

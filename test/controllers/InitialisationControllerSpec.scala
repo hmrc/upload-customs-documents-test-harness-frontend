@@ -17,14 +17,16 @@
 package controllers
 
 import base.GuicySpec
+import config.AppConfig
 import connectors.httpParsers.UploadCustomsDocumentsInitializationHttpParser.NoLocationHeaderReturned
 import connectors.mocks.MockUploadDocumentsConnector
 import forms.UploadCustomsDocumentInitialisationFormProvider
 import models.InitialisationModel
+import play.api.Configuration
 import play.api.http.Status
 import play.api.libs.json.Json
-import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import views.html.InitialisationPage
 
 import scala.concurrent.Future
@@ -75,16 +77,37 @@ class InitialisationControllerSpec extends GuicySpec with MockUploadDocumentsCon
 
     "form contains valid JSON" when {
 
-      "response from connector is Right(redirectUrl)" must {
+      "response from connector is Right(redirectUrl)" when {
 
-        "return 303" in {
+        "the external host url is an internal url (locally)" must {
+          "return 303 redirecting to internal url" in {
 
-          mockInitialise(InitialisationModel(Json.obj(), "foo"))(Future(Right("/foo")))
+            mockInitialise(InitialisationModel(Json.obj(), "foo", "internalUrl"))(Future(Right("/foo")))
 
-          val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}", "userAgent" -> "foo"))
+            val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}", "userAgent" -> "foo", "url" -> "internalUrl"))
 
-          status(result) mustBe Status.SEE_OTHER
-          redirectLocation(result) mustBe Some(appConfig.uploadCustomsDocumentsUrl + "/foo")
+            status(result) mustBe Status.SEE_OTHER
+            redirectLocation(result) mustBe Some("internalUrl" + "/foo")
+          }
+        }
+        "the external host url is not internal url (non-local)" must {
+
+          "return 303 redirecting to external host url" in {
+
+            mockInitialise(InitialisationModel(Json.obj(), "foo", "bar"))(Future(Right("/foo")))
+
+            lazy val appConfig: AppConfig = new AppConfig(inject[Configuration], inject[ServicesConfig]) {
+              override val host: String = "baz"
+              override val hostDNS: String = "localhost"
+            }
+
+            val testController =
+              new InitialisationController(mcc, view, form, mockUploadCustomsDocumentsConnector)(ec, appConfig)
+            val result = testController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}", "userAgent" -> "foo", "url" -> "bar"))
+
+            status(result) mustBe Status.SEE_OTHER
+            redirectLocation(result) mustBe Some("baz" + "/foo")
+          }
         }
       }
 
@@ -92,9 +115,9 @@ class InitialisationControllerSpec extends GuicySpec with MockUploadDocumentsCon
 
         "return ISE" in {
 
-          mockInitialise(InitialisationModel(Json.obj(), "foo"))(Future(Left(NoLocationHeaderReturned)))
+          mockInitialise(InitialisationModel(Json.obj(), "foo", "bar"))(Future(Left(NoLocationHeaderReturned)))
 
-          val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}", "userAgent" -> "foo"))
+          val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}", "userAgent" -> "foo", "url" -> "bar"))
 
           status(result) mustBe Status.INTERNAL_SERVER_ERROR
         }

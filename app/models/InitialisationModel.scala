@@ -20,7 +20,7 @@ import config.AppConfig
 import play.api.libs.json.{JsObject, JsValue, Json}
 
 //TODO: Change this to reflect the individual configurable options?
-case class InitialisationModel(json: JsValue, userAgent: String)
+case class InitialisationModel(json: JsValue, userAgent: String, url: String)
 
 object InitialisationModel {
 
@@ -34,5 +34,5 @@ object InitialisationModel {
   )
 
   def defaultConfig()(implicit appConfig: AppConfig): InitialisationModel =
-    InitialisationModel(minimumJson(), appConfig.defaultUserAgent)
+    InitialisationModel(minimumJson(), appConfig.defaultUserAgent, appConfig.uploadCustomsDocumentsDNS)
 }

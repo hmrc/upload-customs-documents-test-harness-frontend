@@ -17,20 +17,15 @@
 package controllers
 
 import config.AppConfig
-import connectors.UploadCustomsDocumentsConnector
-import forms.UploadCustomsDocumentInitialisationFormProvider
-import models.{InitialisationModel, UploadedFile}
-import play.api.data.Form
-import play.api.i18n.Messages
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
-import play.twirl.api.HtmlFormat
+import models.UploadedFile
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.UploadedFilesResponseRepo
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil
-import views.html.{InitialisationPage, UploadedFilesPage}
+import views.html.UploadedFilesPage
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class UploadedFilesController @Inject()(mcc: MessagesControllerComponents,

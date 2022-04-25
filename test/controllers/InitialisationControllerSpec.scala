@@ -23,7 +23,6 @@ import forms.UploadCustomsDocumentInitialisationFormProvider
 import models.InitialisationModel
 import play.api.http.Status
 import play.api.libs.json.Json
-import play.api.mvc.MessagesControllerComponents
 import play.api.test.Helpers._
 import views.html.InitialisationPage
 
@@ -79,12 +78,12 @@ class InitialisationControllerSpec extends GuicySpec with MockUploadDocumentsCon
 
         "return 303" in {
 
-          mockInitialise(InitialisationModel(Json.obj(), "foo"))(Future(Right("/foo")))
+          mockInitialise(InitialisationModel(Json.obj(), "foo", "bar"))(Future(Right("/foo")))
 
-          val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}", "userAgent" -> "foo"))
+          val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}", "userAgent" -> "foo", "url" -> "bar"))
 
           status(result) mustBe Status.SEE_OTHER
-          redirectLocation(result) mustBe Some(appConfig.uploadCustomsDocumentsUrl + "/foo")
+          redirectLocation(result) mustBe Some("bar" + "/foo")
         }
       }
 
@@ -92,9 +91,9 @@ class InitialisationControllerSpec extends GuicySpec with MockUploadDocumentsCon
 
         "return ISE" in {
 
-          mockInitialise(InitialisationModel(Json.obj(), "foo"))(Future(Left(NoLocationHeaderReturned)))
+          mockInitialise(InitialisationModel(Json.obj(), "foo", "bar"))(Future(Left(NoLocationHeaderReturned)))
 
-          val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}", "userAgent" -> "foo"))
+          val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}", "userAgent" -> "foo", "url" -> "bar"))
 
           status(result) mustBe Status.INTERNAL_SERVER_ERROR
         }

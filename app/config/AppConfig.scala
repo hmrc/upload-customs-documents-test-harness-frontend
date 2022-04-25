@@ -20,22 +20,21 @@ import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.duration.Duration
 
 @Singleton
 class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig) {
 
   val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
 
-  val host = servicesConfig.getString("host")
+  val host = servicesConfig.baseUrl("upload-customs-documents-test-harness-frontend")
 
   val uploadCustomsDocumentsDNS: String = servicesConfig.baseUrl("upload-customs-documents-frontend")
-  val uploadCustomsDocumentsUrl: String = servicesConfig.getString("upload-customs-documents-frontend.url")
+  val uploadDocumentsDNS: String = servicesConfig.baseUrl("upload-documents-frontend")
   def authStubUrl: String = servicesConfig.getString("auth-stub.url") + "?continue=" + host + controllers.routes.InitialisationController.intialiseParams.url
 
   //Initialisation Defaults
   def backLinkUrl: String = host + controllers.routes.InitialisationController.intialiseParams.url
   def continueUrl(nonce: Int): String = host + controllers.routes.UploadedFilesController.listFiles(nonce).url
-  def callbackDNSRoute: String = servicesConfig.baseUrl("upload-customs-documents-test-harness-frontend") + controllers.internal.routes.UploadedFilesCallbackController.post.url
+  def callbackDNSRoute: String = host + controllers.internal.routes.UploadedFilesCallbackController.post.url
   val defaultUserAgent: String = servicesConfig.getString("defaultUserAgent")
 }

@@ -19,7 +19,6 @@ package config
 
 import com.google.inject.AbstractModule
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.http.ws.UploadHttpClient
 

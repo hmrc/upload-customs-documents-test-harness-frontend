@@ -31,7 +31,7 @@ class UploadCustomsDocumentInitialisationFormProviderSpec extends SpecBase {
 
       "return form error" in {
 
-        val result: Form[InitialisationModel] = form.bind(Map("json" -> "", "userAgent" -> "foo"))
+        val result: Form[InitialisationModel] = form.bind(Map("json" -> "", "userAgent" -> "foo", "url" -> "someUrl"))
 
         result.hasErrors mustBe true
         result.error("json") mustBe Some(FormError("json", Seq("Not Valid JSON!")))
@@ -42,10 +42,10 @@ class UploadCustomsDocumentInitialisationFormProviderSpec extends SpecBase {
 
       "return form" in {
 
-        val result: Form[InitialisationModel] = form.bind(Map("json" -> "{}", "userAgent" -> "foo"))
+        val result: Form[InitialisationModel] = form.bind(Map("json" -> "{}", "userAgent" -> "foo", "url" -> "someUrl"))
 
         result.hasErrors mustBe false
-        result.value mustBe Some(InitialisationModel(Json.obj(), "foo"))
+        result.value mustBe Some(InitialisationModel(Json.obj(), "foo", "someUrl"))
       }
     }
 
@@ -53,10 +53,21 @@ class UploadCustomsDocumentInitialisationFormProviderSpec extends SpecBase {
 
       "return form" in {
 
-        val result: Form[InitialisationModel] = form.bind(Map("json" -> "{}"))
+        val result: Form[InitialisationModel] = form.bind(Map("json" -> "{}", "url" -> "someUrl"))
 
         result.hasErrors mustBe true
         result.error("userAgent") mustBe Some(FormError("userAgent", Seq("error.required")))
+      }
+    }
+
+    "url is missing" must {
+
+      "return form" in {
+
+        val result: Form[InitialisationModel] = form.bind(Map("json" -> "{}", "userAgent" -> "foo"))
+
+        result.hasErrors mustBe true
+        result.error("url") mustBe Some(FormError("url", Seq("error.required")))
       }
     }
   }

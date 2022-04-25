@@ -20,12 +20,10 @@ import config.AppConfig
 import org.scalatestplus.play.guice._
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
+import play.api.inject.Injector
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.inject.{Injector, bind}
 import play.api.mvc.MessagesControllerComponents
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import scala.concurrent.ExecutionContext
 
 trait GuicySpec extends SpecBase with GuiceOneAppPerSuite {

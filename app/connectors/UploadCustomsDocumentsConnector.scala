@@ -20,20 +20,19 @@ import config.AppConfig
 import connectors.httpParsers.UploadCustomsDocumentsInitializationHttpParser.{UploadCustomsDocumentsInitializationReads, UploadCustomsDocumentsInitializationResponse}
 import models.InitialisationModel
 import play.api.http.HeaderNames
-import play.api.i18n.MessagesApi
 import uk.gov.hmrc.http.{HeaderCarrier, HttpPost}
 import utils.LoggerUtil
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class UploadCustomsDocumentsConnector @Inject()(http: HttpPost, implicit val appConfig: AppConfig) extends LoggerUtil {
+class UploadCustomsDocumentsConnector @Inject()(http: HttpPost) extends LoggerUtil {
 
   //TODO: Pass through a model representing all the configurable parameters
   def initialize(configuration: InitialisationModel)
-                (implicit hc: HeaderCarrier, ec: ExecutionContext, messages: MessagesApi): Future[UploadCustomsDocumentsInitializationResponse] = {
+                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[UploadCustomsDocumentsInitializationResponse] = {
 
-    val url = appConfig.uploadCustomsDocumentsDNS + "/internal/initialize"
+    val url = configuration.url + "/internal/initialize"
     logger.debug(s"URL: $url, Body: \n\n${configuration.json}")
 
     http.POST(

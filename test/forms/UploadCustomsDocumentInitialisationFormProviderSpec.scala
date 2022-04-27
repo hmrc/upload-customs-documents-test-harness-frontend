@@ -45,7 +45,7 @@ class UploadCustomsDocumentInitialisationFormProviderSpec extends SpecBase {
         val result: Form[InitialisationModel] = form.bind(Map("json" -> "{}", "userAgent" -> "foo", "url" -> "someUrl"))
 
         result.hasErrors mustBe false
-        result.value mustBe Some(InitialisationModel(Json.obj(), "foo", "someUrl"))
+        result.value mustBe Some(InitialisationModel("{}", "foo", "someUrl"))
       }
     }
 

@@ -26,7 +26,7 @@ import play.api.libs.json.Json
 class UploadCustomsDocumentsConnectorSpec extends GuicySpec with MockHttp {
 
   val locationHeaderUrl = "/foo"
-  val initModel = InitialisationModel(Json.obj("foo" -> "bar"), "foo-bar-agent", appConfig.uploadCustomsDocumentsDNS)
+  val initModel = InitialisationModel(Json.obj("foo" -> "bar").toString, "foo-bar-agent", appConfig.uploadCustomsDocumentsDNS)
 
   object TestUploadCustomsDocumentsConnector extends UploadCustomsDocumentsConnector(mockHttp)
 
@@ -40,7 +40,7 @@ class UploadCustomsDocumentsConnectorSpec extends GuicySpec with MockHttp {
 
           setupMockHttpPost(
             url = appConfig.uploadCustomsDocumentsDNS + "/internal/initialize",
-            model = initModel.json,
+            model = Json.parse(initModel.json),
             headers = Seq(HeaderNames.USER_AGENT -> initModel.userAgent)
           )(Right(locationHeaderUrl))
 
@@ -57,7 +57,7 @@ class UploadCustomsDocumentsConnectorSpec extends GuicySpec with MockHttp {
 
           setupMockHttpPost(
             url = appConfig.uploadCustomsDocumentsDNS + "/internal/initialize",
-            model = initModel.json,
+            model = Json.parse(initModel.json),
             headers = Seq(HeaderNames.USER_AGENT -> initModel.userAgent)
           )(Left(NoLocationHeaderReturned))
 

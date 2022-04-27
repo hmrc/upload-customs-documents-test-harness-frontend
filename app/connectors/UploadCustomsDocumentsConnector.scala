@@ -16,10 +16,10 @@
 
 package connectors
 
-import config.AppConfig
 import connectors.httpParsers.UploadCustomsDocumentsInitializationHttpParser.{UploadCustomsDocumentsInitializationReads, UploadCustomsDocumentsInitializationResponse}
 import models.InitialisationModel
 import play.api.http.HeaderNames
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpPost}
 import utils.LoggerUtil
 
@@ -37,7 +37,7 @@ class UploadCustomsDocumentsConnector @Inject()(http: HttpPost) extends LoggerUt
 
     http.POST(
       url = url,
-      body = configuration.json,
+      body = Json.parse(configuration.json),
       headers = Seq(HeaderNames.USER_AGENT -> configuration.userAgent)
     )(implicitly, UploadCustomsDocumentsInitializationReads, hc, ec)
   }

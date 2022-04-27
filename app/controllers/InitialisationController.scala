@@ -24,6 +24,7 @@ import play.api.data.Form
 import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.HtmlFormat
+import repositories.UploadedFilesResponseRepo
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.InitialisationPage
 
@@ -35,15 +36,18 @@ class InitialisationController @Inject() (
   mcc: MessagesControllerComponents,
   view: InitialisationPage,
   intialisationForm: UploadCustomsDocumentInitialisationFormProvider,
-  uploadCustomsDocumentsConnector: UploadCustomsDocumentsConnector
+  uploadCustomsDocumentsConnector: UploadCustomsDocumentsConnector,
+  uploadedFilesResponseRepo: UploadedFilesResponseRepo
 )(implicit ec: ExecutionContext, appConfig: AppConfig)
     extends FrontendController(mcc) {
 
   private def renderView(form: Form[_])(implicit request: Request[_], messages: Messages): HtmlFormat.Appendable =
     view(controllers.routes.InitialisationController.postInitialisation, form)
 
-  val intialiseParams: Action[AnyContent] = Action { implicit request =>
-    Ok(renderView(intialisationForm().fill(InitialisationModel.defaultConfig())))
+  val intialiseParams: Action[AnyContent] = Action.async { implicit request =>
+    uploadedFilesResponseRepo.getRecord(12345).map { maybePreviousFiles =>
+      Ok(renderView(intialisationForm().fill(InitialisationModel.defaultConfig(maybePreviousFiles))))
+    }
   }
 
   val postInitialisation: Action[AnyContent] = Action.async { implicit request =>

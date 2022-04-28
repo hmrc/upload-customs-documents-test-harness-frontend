@@ -32,7 +32,13 @@ object InitialisationModel {
         "nonce" -> 12345,
         "continueUrl" -> appConfig.continueUrl(12345),
         "backlinkUrl" -> appConfig.backLinkUrl,
-        "callbackUrl" -> appConfig.callbackDNSRoute
+        "callbackUrl" -> appConfig.callbackDNSRoute,
+        "features" -> Json.obj(
+          "showUploadMultiple"              -> true,
+          "showLanguageSelection"           -> true,
+          "showAddAnotherDocumentButton"    -> false,
+          "showYesNoQuestionBeforeContinue" -> false
+        )
       )
     ).deepMerge(previousFiles)
   }

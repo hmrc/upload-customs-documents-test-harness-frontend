@@ -25,7 +25,7 @@ import play.api.i18n.Messages
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.HtmlFormat
 import repositories.UploadedFilesResponseRepo
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.InitialisationPage
 
 import javax.inject.{Inject, Singleton}
@@ -33,13 +33,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class InitialisationController @Inject() (
-  mcc: MessagesControllerComponents,
+  val controllerComponents: MessagesControllerComponents,
   view: InitialisationPage,
   intialisationForm: UploadCustomsDocumentInitialisationFormProvider,
   uploadCustomsDocumentsConnector: UploadCustomsDocumentsConnector,
   uploadedFilesResponseRepo: UploadedFilesResponseRepo
 )(implicit ec: ExecutionContext, appConfig: AppConfig)
-    extends FrontendController(mcc) {
+    extends FrontendBaseController {
 
   private def renderView(form: Form[_])(implicit request: Request[_], messages: Messages): HtmlFormat.Appendable =
     view(controllers.routes.InitialisationController.postInitialisation, form)
@@ -57,10 +57,10 @@ class InitialisationController @Inject() (
         formWithErrors => Future.successful(BadRequest(renderView(formWithErrors))),
         initialisationModel =>
           uploadCustomsDocumentsConnector.initialize(initialisationModel).map {
-            case Left(_)         => InternalServerError
+            case Left(_) => InternalServerError
             case Right(redirect) =>
               val host =
-                if(appConfig.hostDNS == appConfig.host) initialisationModel.url else appConfig.host
+                if (appConfig.hostDNS == appConfig.host) initialisationModel.url else appConfig.host
               Redirect(host + redirect)
           }
       )

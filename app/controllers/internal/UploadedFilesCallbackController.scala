@@ -18,20 +18,25 @@ package controllers.internal
 
 import config.AppConfig
 import models.UploadedFilesCallback
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, MessagesControllerComponents}
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.mvc.Action
+import play.api.mvc.MessagesControllerComponents
 import repositories.UploadedFilesResponseRepo
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class UploadedFilesCallbackController @Inject()(mcc: MessagesControllerComponents,
-                                                uploadedFilesResponseRepo: UploadedFilesResponseRepo)
-                                               (implicit val ec: ExecutionContext, val appConfig: AppConfig)
-  extends FrontendController(mcc) with LoggerUtil {
+class UploadedFilesCallbackController @Inject() (
+  mcc: MessagesControllerComponents,
+  uploadedFilesResponseRepo: UploadedFilesResponseRepo
+)(implicit val ec: ExecutionContext, val appConfig: AppConfig)
+    extends FrontendController(mcc)
+    with LoggerUtil {
 
   val post: Action[JsValue] = Action.async(parse.tolerantJson) { implicit request =>
     withJsonBody[UploadedFilesCallback] { uploadedFilesCallback =>

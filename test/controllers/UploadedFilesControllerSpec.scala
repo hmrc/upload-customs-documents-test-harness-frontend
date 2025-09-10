@@ -42,7 +42,7 @@ class UploadedFilesControllerSpec extends GuicySpec with MockUploadDocumentsConn
     "return HTML" in {
       val result = TestController.listFiles(nonce)(fakeRequest)
       contentType(result) mustBe Some("text/html")
-      charset(result)     mustBe Some("utf-8")
+      charset(result) mustBe Some("utf-8")
     }
   }
 }

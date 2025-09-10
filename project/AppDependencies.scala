@@ -2,17 +2,21 @@ import sbt._
 
 object AppDependencies {
 
+  val hmrcMongoPlayVersion = "2.7.0"
+
   val compile = Seq(
-    "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "7.3.0",
-    "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "3.24.0-play-28",
-    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"         % "0.73.0"
+    "uk.gov.hmrc"       %% "bootstrap-frontend-play-30" % "10.1.0",
+    "uk.gov.hmrc"       %% "play-frontend-hmrc-play-30" % "12.11.0",
+    "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-30"         % hmrcMongoPlayVersion
   )
 
   val test = Seq(
-    "uk.gov.hmrc"         %% "bootstrap-test-play-28"  % "7.3.0"  % "test, it",
-    "uk.gov.hmrc.mongo"   %% "hmrc-mongo-test-play-28" % "0.73.0" % Test,
-    "org.jsoup"            % "jsoup"                   % "1.15.3" % Test,
-    "com.vladsch.flexmark" % "flexmark-all"            % "0.36.8" % "test, it",
-    "org.scalamock"       %% "scalamock"               % "5.1.0"  % Test
+    "uk.gov.hmrc"         %% "bootstrap-test-play-30"  % "10.1.0"             % Test,
+    "uk.gov.hmrc.mongo"   %% "hmrc-mongo-test-play-30" % hmrcMongoPlayVersion % Test,
+    "org.jsoup"            % "jsoup"                   % "1.21.2"             % Test,
+    "com.vladsch.flexmark" % "flexmark-all"            % "0.64.8"             % Test,
+    "org.scalamock"       %% "scalamock"               % "7.5.0"              % Test
   )
+
+  val itDependencies = Seq()
 }

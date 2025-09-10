@@ -38,13 +38,14 @@ class InitialisationControllerSpec extends GuicySpec with MockUploadDocumentsCon
   lazy val form = app.injector.instanceOf[UploadCustomsDocumentInitialisationFormProvider]
   lazy val repo = app.injector.instanceOf[UploadedFilesResponseRepo]
 
-  object TestController extends InitialisationController(
-    mcc,
-    view,
-    form,
-    mockUploadCustomsDocumentsConnector,
-    repo
-  )
+  object TestController
+      extends InitialisationController(
+        mcc,
+        view,
+        form,
+        mockUploadCustomsDocumentsConnector,
+        repo
+      )
 
   "calling .intialiseParams" should {
 
@@ -56,7 +57,7 @@ class InitialisationControllerSpec extends GuicySpec with MockUploadDocumentsCon
     "return HTML" in {
       val result = TestController.intialiseParams(fakeRequest)
       contentType(result) mustBe Some("text/html")
-      charset(result)     mustBe Some("utf-8")
+      charset(result) mustBe Some("utf-8")
     }
   }
 
@@ -65,7 +66,8 @@ class InitialisationControllerSpec extends GuicySpec with MockUploadDocumentsCon
     "form does not contain valid JSON" must {
 
       "return 400" in {
-        val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "", "userAgent" -> "foo"))
+        val result =
+          TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "", "userAgent" -> "foo"))
         status(result) mustBe Status.BAD_REQUEST
       }
     }
@@ -82,12 +84,14 @@ class InitialisationControllerSpec extends GuicySpec with MockUploadDocumentsCon
 
       "response from connector is Right(redirectUrl)" when {
 
-        "the external host url is an internal url (locally)" must {
+        "the external host url is an internal url (locally)"    must {
           "return 303 redirecting to internal url" in {
 
             mockInitialise(InitialisationModel("{}", "foo", "internalUrl"))(Future(Right("/foo")))
 
-            val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}", "userAgent" -> "foo", "url" -> "internalUrl"))
+            val result = TestController.postInitialisation(
+              fakeRequest.withFormUrlEncodedBody("json" -> "{}", "userAgent" -> "foo", "url" -> "internalUrl")
+            )
 
             status(result) mustBe Status.SEE_OTHER
             redirectLocation(result) mustBe Some("internalUrl" + "/foo")
@@ -100,13 +104,15 @@ class InitialisationControllerSpec extends GuicySpec with MockUploadDocumentsCon
             mockInitialise(InitialisationModel("{}", "foo", "bar"))(Future(Right("/foo")))
 
             lazy val appConfig: AppConfig = new AppConfig(inject[Configuration], inject[ServicesConfig]) {
-              override val host: String = "baz"
+              override val host: String    = "baz"
               override val hostDNS: String = "localhost"
             }
 
             val testController =
               new InitialisationController(mcc, view, form, mockUploadCustomsDocumentsConnector, repo)(ec, appConfig)
-            val result = testController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}", "userAgent" -> "foo", "url" -> "bar"))
+            val result         = testController.postInitialisation(
+              fakeRequest.withFormUrlEncodedBody("json" -> "{}", "userAgent" -> "foo", "url" -> "bar")
+            )
 
             status(result) mustBe Status.SEE_OTHER
             redirectLocation(result) mustBe Some("baz" + "/foo")
@@ -120,7 +126,9 @@ class InitialisationControllerSpec extends GuicySpec with MockUploadDocumentsCon
 
           mockInitialise(InitialisationModel("{}", "foo", "bar"))(Future(Left(NoLocationHeaderReturned)))
 
-          val result = TestController.postInitialisation(fakeRequest.withFormUrlEncodedBody("json" -> "{}", "userAgent" -> "foo", "url" -> "bar"))
+          val result = TestController.postInitialisation(
+            fakeRequest.withFormUrlEncodedBody("json" -> "{}", "userAgent" -> "foo", "url" -> "bar")
+          )
 
           status(result) mustBe Status.INTERNAL_SERVER_ERROR
         }

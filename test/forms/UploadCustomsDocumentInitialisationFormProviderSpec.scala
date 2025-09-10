@@ -18,7 +18,8 @@ package forms
 
 import base.SpecBase
 import models.InitialisationModel
-import play.api.data.{Form, FormError}
+import play.api.data.Form
+import play.api.data.FormError
 import play.api.libs.json.Json
 
 class UploadCustomsDocumentInitialisationFormProviderSpec extends SpecBase {

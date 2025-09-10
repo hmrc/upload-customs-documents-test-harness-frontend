@@ -17,14 +17,17 @@
 package controllers.internal
 
 import base.GuicySpec
-import models.{UploadedFile, UploadedFilesCallback}
+import models.UploadedFile
+import models.UploadedFilesCallback
 import org.scalatest.BeforeAndAfterEach
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.UploadedFilesResponseRepo
 
-import java.time.{Instant, ZoneId, ZonedDateTime}
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 class UploadedFilesCallbackControllerSpec extends GuicySpec with BeforeAndAfterEach {
 

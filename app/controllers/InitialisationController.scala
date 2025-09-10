@@ -22,14 +22,19 @@ import forms.UploadCustomsDocumentInitialisationFormProvider
 import models.InitialisationModel
 import play.api.data.Form
 import play.api.i18n.Messages
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Request
 import play.twirl.api.HtmlFormat
 import repositories.UploadedFilesResponseRepo
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.InitialisationPage
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class InitialisationController @Inject() (
@@ -57,7 +62,7 @@ class InitialisationController @Inject() (
         formWithErrors => Future.successful(BadRequest(renderView(formWithErrors))),
         initialisationModel =>
           uploadCustomsDocumentsConnector.initialize(initialisationModel).map {
-            case Left(_) => InternalServerError
+            case Left(_)         => InternalServerError
             case Right(redirect) =>
               val host =
                 if (appConfig.hostDNS == appConfig.host) initialisationModel.url else appConfig.host

@@ -16,22 +16,27 @@
 
 package controllers
 
-import config.AppConfig
 import models.UploadedFile
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import repositories.UploadedFilesResponseRepo
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil
 import views.html.UploadedFilesPage
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class UploadedFilesController @Inject()(mcc: MessagesControllerComponents,
-                                        view: UploadedFilesPage,
-                                        uploadedFilesRepo: UploadedFilesResponseRepo)
-                                       (implicit ec: ExecutionContext, appConfig: AppConfig) extends FrontendController(mcc) with LoggerUtil {
+class UploadedFilesController @Inject() (
+  mcc: MessagesControllerComponents,
+  view: UploadedFilesPage,
+  uploadedFilesRepo: UploadedFilesResponseRepo
+)(implicit ec: ExecutionContext)
+    extends FrontendController(mcc)
+    with LoggerUtil {
 
   def listFiles(nonce: Int): Action[AnyContent] = Action.async { implicit request =>
     uploadedFilesRepo.getRecord(nonce).map { oUploadedFiles =>

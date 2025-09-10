@@ -1,5 +1,5 @@
 @*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,10 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.button.Button
+
 @this(govukButton: GovukButton)
 
 @(msg: String, idForButton: String = "button-1")(implicit messages: Messages)
@@ -22,6 +26,6 @@
     Button(
         attributes = Map("id" -> idForButton),
         content = Text(messages(msg)),
-        preventDoubleClick = true
+        preventDoubleClick = Some(true)
     )
 )

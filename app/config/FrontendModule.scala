@@ -16,14 +16,14 @@
 
 package config
 
-
 import com.google.inject.AbstractModule
-import play.api.{Configuration, Environment}
+import play.api.Configuration
+import play.api.Environment
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.play.http.ws.UploadHttpClient
+import uk.gov.hmrc.play.http.ws.DebuggingHttpClientV2
+import uk.gov.hmrc.http.client.HttpClientV2
 
 class FrontendModule(val environment: Environment, val configuration: Configuration) extends AbstractModule {
-  override def configure(): Unit = {
-    bind(classOf[HttpPost]).to(classOf[UploadHttpClient])
-  }
+  override def configure(): Unit =
+    bind(classOf[HttpClientV2]).to(classOf[DebuggingHttpClientV2])
 }

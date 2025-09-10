@@ -22,15 +22,20 @@ import models.InitialisationModel
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
+import org.scalatest.TestSuite
 
 trait MockUploadDocumentsConnector extends MockFactory {
+  this: TestSuite =>
 
   val mockUploadCustomsDocumentsConnector: UploadCustomsDocumentsConnector = mock[UploadCustomsDocumentsConnector]
 
-  def mockInitialise(config: InitialisationModel)(response: Future[UploadCustomsDocumentsInitializationResponse]): Unit = {
-    (mockUploadCustomsDocumentsConnector.initialize(_: InitialisationModel)(_: HeaderCarrier, _: ExecutionContext))
+  def mockInitialise(
+    config: InitialisationModel
+  )(response: Future[UploadCustomsDocumentsInitializationResponse]): Unit =
+    (mockUploadCustomsDocumentsConnector
+      .initialize(_: InitialisationModel)(_: HeaderCarrier, _: ExecutionContext))
       .expects(config, *, *)
       .returns(response)
-  }
 }

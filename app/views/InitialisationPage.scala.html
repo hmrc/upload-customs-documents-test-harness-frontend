@@ -15,6 +15,13 @@
  *@
 
 @import config.AppConfig
+@import uk.gov.hmrc.govukfrontend.views.html.components.FormWithCSRF
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Fieldset
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.Legend
 
 @this(
         layout: Layout,
@@ -44,11 +51,7 @@
             RadioItem(
                 content = Text(messages("initialise.url.upload-customs-documents")),
                 value = Some(appConfig.uploadCustomsDocumentsDNS),
-                checked = form("url").value.contains(appConfig.uploadCustomsDocumentsDNS)),
-            RadioItem(
-                content = Text(messages("initialise.url.upload-documents")),
-                value = Some(appConfig.uploadDocumentsDNS),
-                checked = form("url").value.contains(appConfig.uploadDocumentsDNS))
+                checked = form("url").value.contains(appConfig.uploadCustomsDocumentsDNS))
         ),
         name = "url",
         fieldset = Some(Fieldset(legend = Some(Legend(content = Text(messages("initialise.url.label")))))),

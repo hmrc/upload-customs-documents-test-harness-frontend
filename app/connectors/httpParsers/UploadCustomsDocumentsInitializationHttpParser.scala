@@ -18,27 +18,29 @@ package connectors.httpParsers
 
 import play.api.http.HeaderNames
 import play.api.http.Status._
-import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+import uk.gov.hmrc.http.HttpReads
+import uk.gov.hmrc.http.HttpResponse
 import utils.LoggerUtil
 
 object UploadCustomsDocumentsInitializationHttpParser extends LoggerUtil {
 
   type UploadCustomsDocumentsInitializationResponse = Either[ErrorResponse, String]
 
-  implicit object UploadCustomsDocumentsInitializationReads extends HttpReads[UploadCustomsDocumentsInitializationResponse] {
+  implicit object UploadCustomsDocumentsInitializationReads
+      extends HttpReads[UploadCustomsDocumentsInitializationResponse] {
 
     def read(method: String, url: String, response: HttpResponse): UploadCustomsDocumentsInitializationResponse = {
-      logger.debug(s"[read] response: ${response}")
+      logger.debug(s"[read] response: $response")
       response.status match {
         case CREATED =>
           response.header(HeaderNames.LOCATION) match {
             case Some(url) => Right(url)
-            case None =>
+            case None      =>
               logger.debug(s"[read]: No Location Header in response: ${response.headers}")
               logger.warn(s"[read]: No Location Header returned from Upload Customs Documents Frontend")
               Left(NoLocationHeaderReturned)
           }
-        case status =>
+        case status  =>
           logger.warn(s"[read]: Unexpected response, status $status returned")
           Left(UnexpectedFailure(status))
       }
@@ -51,8 +53,9 @@ object UploadCustomsDocumentsInitializationHttpParser extends LoggerUtil {
   }
 
   object NoLocationHeaderReturned extends ErrorResponse {
-    override val status: Int = INTERNAL_SERVER_ERROR
-    override val body: String = "Upload Customs Documents Frontend returned CREATED (201) but did not provide a Location header"
+    override val status: Int  = INTERNAL_SERVER_ERROR
+    override val body: String =
+      "Upload Customs Documents Frontend returned CREATED (201) but did not provide a Location header"
   }
   case class UnexpectedFailure(override val status: Int) extends ErrorResponse {
     override val body: String = s"Unexpected response, status $status returned"

@@ -16,19 +16,68 @@
 
 package connectors.mocks
 
+import izumi.reflect.Tag
+import org.scalamock.handlers.CallHandler2
+import org.scalamock.handlers.CallHandler4
 import org.scalamock.scalatest.MockFactory
-import play.api.libs.json.Writes
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
+import org.scalatest.TestSuite
+import play.api.libs.ws.BodyWritable
+import play.api.libs.ws.WSRequest
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.client.RequestBuilder
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.HttpReads
+import uk.gov.hmrc.http.*
 
-import scala.concurrent.{ExecutionContext, Future}
+import java.net.URL
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 trait MockHttp extends MockFactory {
+  this: TestSuite =>
 
-  val mockHttp: HttpClient = mock[HttpClient]
+  val mockHttp: HttpClientV2             = mock[HttpClientV2]
+  val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
 
-  def setupMockHttpPost[I, O](url: String, model: I, headers: Seq[(String, String)])(response: O): Unit = {
-    (mockHttp.POST(_: String, _: I, _: Seq[(String, String)])(_: Writes[I],_: HttpReads[O], _: HeaderCarrier, _: ExecutionContext))
-      .expects(url, model, headers, *, *, *, *)
-      .returns(Future.successful(response))
-  }
+  def setupMockHttpPost[I, O](url: String, model: I, headers: Seq[(String, String)])(response: O): Unit =
+    mockHttpPost(URL(url)).once()
+    mockRequestBuilderWithBody(model).once()
+    if headers.nonEmpty then mockRequestBuilderTransform(headers).once()
+    mockRequestBuilderTransform().once()
+    mockRequestBuilderExecuteWithoutException(response).once()
+
+  def mockHttpPost[A](url: URL) =
+    (mockHttp
+      .post(_: URL)(_: HeaderCarrier))
+      .expects(url, *)
+      .returning(mockRequestBuilder)
+
+  def mockRequestBuilderWithBody[I](
+    body: I
+  ): CallHandler4[I, BodyWritable[I], Tag[I], ExecutionContext, RequestBuilder] =
+    (mockRequestBuilder
+      .withBody(_: I)(using _: BodyWritable[I], _: Tag[I], _: ExecutionContext))
+      .expects(body, *, *, *)
+      .returning(mockRequestBuilder)
+
+  def mockRequestBuilderTransform(headers: Seq[(String, String)]) =
+    (mockRequestBuilder
+      .transform(_: WSRequest => WSRequest))
+      .expects(*)
+      .returning(mockRequestBuilder.transform(_.addHttpHeaders(headers*)))
+
+  def mockRequestBuilderTransform() =
+    (mockRequestBuilder
+      .transform(_: WSRequest => WSRequest))
+      .expects(*)
+      .returning(mockRequestBuilder)
+
+  def mockRequestBuilderExecuteWithoutException[O](
+    value: O
+  ): CallHandler2[HttpReads[O], ExecutionContext, Future[O]] =
+    (mockRequestBuilder
+      .execute(using _: HttpReads[O], _: ExecutionContext))
+      .expects(*, *)
+      .returning(Future.successful(value))
+
 }

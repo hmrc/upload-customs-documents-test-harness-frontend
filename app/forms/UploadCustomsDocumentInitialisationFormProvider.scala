@@ -17,25 +17,28 @@
 package forms
 
 import models.InitialisationModel
-import play.api.data.Forms._
-import play.api.data._
-import play.api.data.validation.{Constraint, Invalid, Valid}
-import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
+import play.api.data.*
+import play.api.data.Forms.*
+import play.api.data.validation.Constraint
+import play.api.data.validation.Invalid
+import play.api.data.validation.Valid
+import play.api.libs.json.Json
 
 import javax.inject.Inject
 import scala.util.Try
 
-class UploadCustomsDocumentInitialisationFormProvider @Inject()() {
+class UploadCustomsDocumentInitialisationFormProvider @Inject() () {
 
-  val isJson: Constraint[String] = Constraint("isJson")({ plainText =>
+  val isJson: Constraint[String] = Constraint("isJson") { plainText =>
     if (Try(Json.parse(plainText)).isSuccess) Valid else Invalid("Not Valid JSON!")
-  })
+  }
 
   def apply(): Form[InitialisationModel] =
-    Form(mapping(
-      "json" -> text.verifying(isJson),
-      "userAgent" -> nonEmptyText,
-      "url" -> nonEmptyText
-    )(InitialisationModel.apply)(InitialisationModel.unapply))
+    Form(
+      mapping(
+        "json"      -> text.verifying(isJson),
+        "userAgent" -> nonEmptyText,
+        "url"       -> nonEmptyText
+      )(InitialisationModel.apply)(o => Some(Tuple.fromProductTyped(o)))
+    )
 }

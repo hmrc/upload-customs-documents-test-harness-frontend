@@ -19,23 +19,27 @@ package config
 import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
-class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig) {
+class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig) {
 
-  val welshLanguageSupportEnabled: Boolean = config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
+  val welshLanguageSupportEnabled: Boolean =
+    config.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
 
   val host: String = servicesConfig.getString("host")
 
   val uploadCustomsDocumentsDNS: String = servicesConfig.baseUrl("upload-customs-documents-frontend")
-  val uploadDocumentsDNS: String = servicesConfig.baseUrl("upload-documents-frontend")
-  val hostDNS: String = servicesConfig.baseUrl("upload-customs-documents-test-harness-frontend")
-  def authStubUrl: String = servicesConfig.getString("auth-stub.url") + "?continue=" + host + controllers.routes.InitialisationController.intialiseParams.url
+  val uploadDocumentsDNS: String        = servicesConfig.baseUrl("upload-documents-frontend")
+  val hostDNS: String                   = servicesConfig.baseUrl("upload-customs-documents-test-harness-frontend")
+  def authStubUrl: String               = servicesConfig.getString(
+    "auth-stub.url"
+  ) + "?continue=" + host + controllers.routes.InitialisationController.intialiseParams.url
 
-  //Initialisation Defaults
-  def backLinkUrl: String = host + controllers.routes.InitialisationController.intialiseParams.url
+  // Initialisation Defaults
+  def backLinkUrl: String             = host + controllers.routes.InitialisationController.intialiseParams.url
   def continueUrl(nonce: Int): String = host + controllers.routes.UploadedFilesController.listFiles(nonce).url
-  def callbackDNSRoute: String = hostDNS + controllers.internal.routes.UploadedFilesCallbackController.post.url
-  val defaultUserAgent: String = servicesConfig.getString("defaultUserAgent")
+  def callbackDNSRoute: String        = hostDNS + controllers.internal.routes.UploadedFilesCallbackController.post.url
+  val defaultUserAgent: String        = servicesConfig.getString("defaultUserAgent")
 }

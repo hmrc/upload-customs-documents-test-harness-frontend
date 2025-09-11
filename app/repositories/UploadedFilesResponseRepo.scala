@@ -19,31 +19,38 @@ package repositories
 import models.UploadedFilesCallback
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
-import org.mongodb.scala.model.{FindOneAndReplaceOptions, IndexModel, IndexOptions, ReturnDocument}
+import org.mongodb.scala.model.FindOneAndReplaceOptions
+import org.mongodb.scala.model.IndexModel
+import org.mongodb.scala.model.IndexOptions
+import org.mongodb.scala.model.ReturnDocument
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import utils.LoggerUtil
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
-class UploadedFilesResponseRepo @Inject()(mongo: MongoComponent)(implicit ec: ExecutionContext) extends
-  PlayMongoRepository[UploadedFilesCallback](
-    collectionName = "file-upload-callback",
-    mongoComponent = mongo,
-    domainFormat = UploadedFilesCallback.format,
-    indexes = Seq(
-      IndexModel(
-        keys = ascending("nonce"),
-        indexOptions = IndexOptions()
-          .name("nonce-Unique-Index")
-          .unique(true)
-          .sparse(false)
+class UploadedFilesResponseRepo @Inject() (mongo: MongoComponent)(implicit ec: ExecutionContext)
+    extends PlayMongoRepository[UploadedFilesCallback](
+      collectionName = "file-upload-callback",
+      mongoComponent = mongo,
+      domainFormat = UploadedFilesCallback.format,
+      indexes = Seq(
+        IndexModel(
+          keys = ascending("nonce"),
+          indexOptions = IndexOptions()
+            .name("nonce-Unique-Index")
+            .unique(true)
+            .sparse(false)
+        )
       )
     )
-  ) with LoggerUtil {
+    with LoggerUtil {
 
-  def updateRecord(callbackData: UploadedFilesCallback)(implicit ec: ExecutionContext): Future[Option[UploadedFilesCallback]] = {
+  def updateRecord(
+    callbackData: UploadedFilesCallback
+  )(implicit ec: ExecutionContext): Future[Option[UploadedFilesCallback]] = {
     val selector = equal("nonce", callbackData.nonce)
     collection
       .findOneAndReplace(
@@ -52,7 +59,8 @@ class UploadedFilesResponseRepo @Inject()(mongo: MongoComponent)(implicit ec: Ex
         options = FindOneAndReplaceOptions()
           .returnDocument(ReturnDocument.AFTER)
           .upsert(true)
-      ).toFutureOption()
+      )
+      .toFutureOption()
 
   }
 

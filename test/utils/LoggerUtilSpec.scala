@@ -31,7 +31,6 @@ class LoggerUtilSpec extends PlaySpec with LogCapturing {
     }
   }
 
-
   "LoggerUtil" must {
 
     "Provide a logger which" must {
@@ -42,16 +41,14 @@ class LoggerUtilSpec extends PlaySpec with LogCapturing {
       }
 
       Seq(Level.DEBUG, Level.INFO, Level.WARN, Level.ERROR) foreach { level =>
-
         s"output the correct $level level log and prefix with the class name" in {
 
           withCaptureOfLoggingFrom(TestInstanceWithLogging.logger) { logs =>
-
             TestInstanceWithLogging.generateSomeLogs()
 
             logs.find(_.getLevel == level) match {
               case Some(value) => value.getMessage mustBe s"[TestInstanceWithLogging] ${level.toString.toLowerCase}-bar"
-              case None => fail(s"Could not find $level message")
+              case None        => fail(s"Could not find $level message")
             }
           }
         }

@@ -16,15 +16,18 @@
 
 package base
 
-import akka.util.Timeout
+import org.apache.pekko.util.Timeout
 import org.mongodb.scala.bson.BsonDocument
-import org.mongodb.scala.result.{DeleteResult, InsertOneResult}
+import org.mongodb.scala.result.DeleteResult
+import org.mongodb.scala.result.InsertOneResult
 import play.api.test.FutureAwaits
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+import org.mongodb.scala.SingleObservableFuture
+import org.mongodb.scala.ObservableFuture
 
 import scala.reflect.ClassTag
 
-trait MongoHelpers {_: FutureAwaits =>
+trait MongoHelpers { self: FutureAwaits =>
 
   def count[A](repo: => PlayMongoRepository[A])(implicit timeout: Timeout): Long =
     await(repo.collection.countDocuments().toFuture())

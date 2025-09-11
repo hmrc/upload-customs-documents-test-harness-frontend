@@ -16,8 +16,10 @@
 
 package utils
 
-import org.slf4j.{Logger, LoggerFactory}
-import play.api.{LoggerLike, MarkerContext}
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import play.api.LoggerLike
+import play.api.MarkerContext
 
 trait LoggerUtil {
 
@@ -26,11 +28,11 @@ trait LoggerUtil {
   val logger = new LoggerLike {
 
     private lazy val prefixLog: String => String = s"[$className] " + _
-    override val logger: Logger = LoggerFactory.getLogger(s"application.$className")
+    override val logger: Logger                  = LoggerFactory.getLogger(s"application.$className")
 
     override def debug(message: => String)(implicit mc: MarkerContext): Unit = super.debug(prefixLog(message))
-    override def info(message: => String)(implicit mc: MarkerContext): Unit = super.info(prefixLog(message))
-    override def warn(message: => String)(implicit mc: MarkerContext): Unit = super.warn(prefixLog(message))
+    override def info(message: => String)(implicit mc: MarkerContext): Unit  = super.info(prefixLog(message))
+    override def warn(message: => String)(implicit mc: MarkerContext): Unit  = super.warn(prefixLog(message))
     override def error(message: => String)(implicit mc: MarkerContext): Unit = super.error(prefixLog(message))
   }
 }

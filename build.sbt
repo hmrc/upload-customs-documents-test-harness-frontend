@@ -1,34 +1,31 @@
-import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
+import uk.gov.hmrc.DefaultBuildSettings
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "upload-customs-documents-test-harness-frontend"
 
-val silencerVersion = "1.7.7"
+Global / semanticdbEnabled := true
+
+ThisBuild / majorVersion := 0
+ThisBuild / scalaVersion := "3.3.6"
+ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
 
 lazy val microservice = Project(appName, file("."))
-  .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
-  .settings(
-    PlayKeys.playDefaultPort         := 10111,
-    TwirlKeys.templateImports ++= Seq(
-      "play.twirl.api.HtmlFormat",
-      "uk.gov.hmrc.govukfrontend.views.html.components._",
-      "uk.gov.hmrc.hmrcfrontend.views.html.{components => hmrcComponents}"
-    ),
-    majorVersion                     := 0,
-    scalaVersion                     := "2.12.15",
-    libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
-    pipelineStages in Assets := Seq(gzip),
-    // ***************
-    // Use the silencer plugin to suppress warnings
-    scalacOptions += "-P:silencer:pathFilters=routes",
-    libraryDependencies ++= Seq(
-      compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
-      "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
-    )
-    // ***************
+  .enablePlugins(
+    play.sbt.PlayScala,
+    SbtDistributablesPlugin
   )
-  .settings(publishingSettings: _*)
-  .configs(IntegrationTest)
-  .settings(integrationTestSettings(): _*)
-  .settings(resolvers += Resolver.jcenterRepo)
-  .settings(CodeCoverageSettings.settings: _*)
+  .disablePlugins(JUnitXmlReportPlugin)
+  .settings(scalafmtOnCompile := true)
+  .settings(PlayKeys.playDefaultPort := 10111)
+  .settings(Assets / pipelineStages := Seq(uglify))
+  .settings(uglifyOps := UglifyOps.singleFile)
+  .settings(
+    libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
+    scalacOptions += s"-Wconf:src=${target.value}/scala-${scalaBinaryVersion.value}/routes/.*:s,src=${target.value}/scala-${scalaBinaryVersion.value}/twirl/.*:s"
+  )
+
+lazy val it = project
+  .enablePlugins(PlayScala)
+  .dependsOn(microservice % "test->test") // the "test->test" allows reusing test code and test dependencies
+  .settings(DefaultBuildSettings.itSettings())
+  .settings(libraryDependencies ++= AppDependencies.itDependencies)

@@ -16,29 +16,35 @@
 
 package connectors
 
-import connectors.httpParsers.UploadCustomsDocumentsInitializationHttpParser.{UploadCustomsDocumentsInitializationReads, UploadCustomsDocumentsInitializationResponse}
+import connectors.httpParsers.UploadCustomsDocumentsInitializationHttpParser.UploadCustomsDocumentsInitializationReads
+import connectors.httpParsers.UploadCustomsDocumentsInitializationHttpParser.UploadCustomsDocumentsInitializationResponse
 import models.InitialisationModel
 import play.api.http.HeaderNames
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.{HeaderCarrier, HttpPost}
+import play.api.libs.ws.JsonBodyWritables.*
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.client.HttpClientV2
 import utils.LoggerUtil
 
+import java.net.URL
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
-class UploadCustomsDocumentsConnector @Inject()(http: HttpPost) extends LoggerUtil {
+class UploadCustomsDocumentsConnector @Inject() (http: HttpClientV2) extends LoggerUtil {
 
-  //TODO: Pass through a model representing all the configurable parameters
-  def initialize(configuration: InitialisationModel)
-                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[UploadCustomsDocumentsInitializationResponse] = {
+  def initialize(
+    configuration: InitialisationModel
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[UploadCustomsDocumentsInitializationResponse] = {
 
-    val url = configuration.url + "/internal/initialize"
+    val url = URL(configuration.url + "/internal/initialize")
     logger.debug(s"URL: $url, Body: \n\n${configuration.json}")
 
-    http.POST(
-      url = url,
-      body = Json.parse(configuration.json),
-      headers = Seq(HeaderNames.USER_AGENT -> configuration.userAgent)
-    )(implicitly, UploadCustomsDocumentsInitializationReads, hc, ec)
+    http
+      .post(url)
+      .withBody(Json.parse(configuration.json))
+      .transform(_.addHttpHeaders(HeaderNames.USER_AGENT -> configuration.userAgent))
+      .execute[UploadCustomsDocumentsInitializationResponse]
+
   }
 }

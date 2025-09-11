@@ -17,8 +17,11 @@
 package connectors.httpParsers
 
 import base.SpecBase
-import connectors.httpParsers.UploadCustomsDocumentsInitializationHttpParser.{NoLocationHeaderReturned, UnexpectedFailure, UploadCustomsDocumentsInitializationReads}
-import play.api.http.{HeaderNames, Status}
+import connectors.httpParsers.UploadCustomsDocumentsInitializationHttpParser.NoLocationHeaderReturned
+import connectors.httpParsers.UploadCustomsDocumentsInitializationHttpParser.UnexpectedFailure
+import connectors.httpParsers.UploadCustomsDocumentsInitializationHttpParser.UploadCustomsDocumentsInitializationReads
+import play.api.http.HeaderNames
+import play.api.http.Status
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpResponse
 
@@ -33,8 +36,11 @@ class UploadCustomsDocumentsInitializationHttpParserSpec extends SpecBase {
         "return url" in {
 
           val expectedResult = Right("/foo")
-          val actualResult = UploadCustomsDocumentsInitializationReads.read("", "", HttpResponse(Status.CREATED, json = Json.obj(),
-            Map(HeaderNames.LOCATION -> Seq("/foo"))))
+          val actualResult   = UploadCustomsDocumentsInitializationReads.read(
+            "",
+            "",
+            HttpResponse(Status.CREATED, json = Json.obj(), Map(HeaderNames.LOCATION -> Seq("/foo")))
+          )
 
           actualResult mustBe expectedResult
         }
@@ -45,7 +51,11 @@ class UploadCustomsDocumentsInitializationHttpParserSpec extends SpecBase {
         "return a NoLocationHeaderReturned with the value false" in {
 
           val expectedResult = Left(NoLocationHeaderReturned)
-          val actualResult = UploadCustomsDocumentsInitializationReads.read("", "", HttpResponse(Status.CREATED, json = Json.obj(), Map()))
+          val actualResult   = UploadCustomsDocumentsInitializationReads.read(
+            "",
+            "",
+            HttpResponse(Status.CREATED, json = Json.obj(), Map())
+          )
 
           actualResult mustBe expectedResult
         }
@@ -57,7 +67,8 @@ class UploadCustomsDocumentsInitializationHttpParserSpec extends SpecBase {
       "return a Left(UnexpectedFailure)" in {
 
         val expectedResult = Left(UnexpectedFailure(status = Status.INTERNAL_SERVER_ERROR))
-        val actualResult = UploadCustomsDocumentsInitializationReads.read("", "", HttpResponse(Status.INTERNAL_SERVER_ERROR, ""))
+        val actualResult   =
+          UploadCustomsDocumentsInitializationReads.read("", "", HttpResponse(Status.INTERNAL_SERVER_ERROR, ""))
 
         actualResult mustBe expectedResult
       }

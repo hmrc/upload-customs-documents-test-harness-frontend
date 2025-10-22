@@ -19,8 +19,9 @@ package models
 import play.api.libs.json.Format
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
+import play.api.libs.json.JsValue
 
-case class UploadedFilesCallback(nonce: Int, uploadedFiles: Seq[UploadedFile], cargo: Option[JsObject] = None)
+case class UploadedFilesCallback(nonce: Int, uploadedFiles: Seq[UploadedFile], cargo: Option[JsValue] = None)
 
 object UploadedFilesCallback {
   implicit val format: Format[UploadedFilesCallback] = Json.format[UploadedFilesCallback]

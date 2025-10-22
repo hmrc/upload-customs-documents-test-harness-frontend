@@ -21,6 +21,7 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.Json
 
 import java.time.ZonedDateTime
+import play.api.libs.json.JsValue
 
 final case class UploadedFile(
   upscanReference: String,
@@ -30,7 +31,7 @@ final case class UploadedFile(
   fileName: String,
   fileMimeType: String,
   fileSize: Option[Long],
-  cargo: Option[JsObject] = None,
+  cargo: Option[JsValue] = None,
   description: Option[String] = None
 )
 

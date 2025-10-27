@@ -2,3 +2,6 @@
 
 + nocsrf
 POST       /receive-file-uploads    controllers.internal.UploadedFilesCallbackController.post
+
++ nocsrf
+POST       /upscan/v2/initiate      controllers.internal.UpscanInternalController.prepareUpload

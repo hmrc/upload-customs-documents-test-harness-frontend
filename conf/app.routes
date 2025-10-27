@@ -7,4 +7,9 @@ POST       /                        controllers.InitialisationController.postIni
 
 GET        /files/:nonce            controllers.UploadedFilesController.listFiles(nonce: Int)
 
+# UPSCAN PERFORMANCE TESTS SUPPORT
++ nocsrf
+POST       /upscan/upload-proxy           controllers.UpscanUploadController.upload
+GET        /upscan/download/:reference    controllers.UpscanUploadController.download(reference: String)
+
 GET        /assets/*file            controllers.Assets.versioned(path = "/public", file: Asset)

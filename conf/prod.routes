@@ -1,4 +1,4 @@
 # Add all the application routes to the app.routes file
 ->         /upload-customs-documents-test-harness              app.Routes
-->         /internal                  internal.Routes
-->         /                          health.Routes
+->         /                                                   internal.Routes
+->         /                                                   health.Routes

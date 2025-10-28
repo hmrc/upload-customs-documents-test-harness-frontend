@@ -33,7 +33,7 @@ import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-@Singleton()
+@Singleton
 class UpscanUploadController @Inject() (
   mcc: MessagesControllerComponents,
   wsClient: WSClient,

@@ -28,7 +28,7 @@ import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton()
+@Singleton
 class UpscanInternalController @Inject() (
   mcc: MessagesControllerComponents,
   configuration: Configuration

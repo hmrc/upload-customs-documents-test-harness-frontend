@@ -30,7 +30,9 @@ import utils.LoggerUtil
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
+import javax.inject.Singleton
 
+@Singleton
 class UploadedFilesResponseRepo @Inject() (mongo: MongoComponent)(implicit ec: ExecutionContext)
     extends PlayMongoRepository[UploadedFilesCallback](
       collectionName = "file-upload-callback",

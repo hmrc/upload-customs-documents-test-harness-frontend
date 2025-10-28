@@ -34,7 +34,7 @@ class UpscanInternalController @Inject() (
   configuration: Configuration
 ) extends FrontendController(mcc) {
 
-  val baseUrl = configuration.get[String]("upscanStubHostUrl")
+  val uploadFileBaseUrl = configuration.get[String]("upscanStubHostUrl")
 
   final val prepareUpload: Action[AnyContent] =
     Action { request =>
@@ -49,7 +49,7 @@ class UpscanInternalController @Inject() (
             Ok(Json.parse(s"""{
     "reference": "$upscanReference",
     "uploadRequest": {
-        "href": "$baseUrl${controllers.routes.UpscanUploadController.upload.url}",
+        "href": "$uploadFileBaseUrl${controllers.routes.UpscanUploadController.upload.url}",
         "fields": {
             "acl": "private",
             "key": "$upscanReference",

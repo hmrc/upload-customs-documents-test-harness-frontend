@@ -161,12 +161,12 @@ class UpscanCacheScheduler @Inject() (
   ec: ExecutionContext
 ) {
 
-  actorSystem.scheduler.scheduleAtFixedRate(initialDelay = 1.minute, interval = 1.day) { () =>
+  actorSystem.scheduler.scheduleAtFixedRate(initialDelay = 1.minute, interval = 1.hour) { () =>
     actorSystem.log.info(
       s"Cleaning up upscan stub cache. ${UpscanController.upscanInitiateRequestCache.size()} files before cleanup."
     )
     UpscanController.upscanInitiateRequestCache.entrySet().forEach { entry =>
-      if (entry.getValue.createdAt.isBefore(LocalDateTime.now().minusDays(1))) {
+      if (entry.getValue.createdAt.isBefore(LocalDateTime.now().minusHours(1))) {
         val upscanReference = entry.getKey()
         UpscanController.upscanInitiateRequestCache.remove(upscanReference)
         Option(UpscanController.fileUploadsCache.remove(upscanReference)).foreach { fileRef =>

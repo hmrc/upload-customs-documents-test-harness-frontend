@@ -42,7 +42,7 @@ class UpscanUploadController @Inject() (
   ec: ExecutionContext
 ) extends FrontendController(mcc) {
 
-  val baseUrl = configuration.get[String]("upscanStubHostUrl")
+  val downloadFileBaseUrl = configuration.get[String]("downloadFileUrl")
 
   val upload: Action[MultipartFormData[Files.TemporaryFile]] = Action(parse.multipartFormData) { request =>
     val body = request.body
@@ -73,7 +73,7 @@ class UpscanUploadController @Inject() (
                               "reference"     -> JsString(upscanReference),
                               "fileStatus"    -> JsString("READY"),
                               "downloadUrl"   -> JsString(
-                                baseUrl + routes.UpscanUploadController.download(upscanReference).url
+                                downloadFileBaseUrl + routes.UpscanUploadController.download(upscanReference).url
                               ),
                               "uploadDetails" -> Json.obj(
                                 "uploadTimestamp" -> JsString(

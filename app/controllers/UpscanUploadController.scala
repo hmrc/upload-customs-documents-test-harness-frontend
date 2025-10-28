@@ -16,6 +16,7 @@
 
 package controllers
 
+import org.apache.pekko.actor.ActorSystem
 import play.api.Configuration
 import play.api.libs.Files
 import play.api.libs.Files.TemporaryFile
@@ -30,6 +31,7 @@ import java.time.format.DateTimeFormatter
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.duration.*
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
@@ -131,7 +133,8 @@ object UpscanController {
     errorRedirect: String,
     minimumFileSize: Option[Int] = None,
     maximumFileSize: Option[Int] = None,
-    consumingService: Option[String] = None
+    consumingService: Option[String] = None,
+    createdAt: LocalDateTime = LocalDateTime.now()
   )
 
   object UpscanInitiateRequest {
@@ -149,4 +152,34 @@ object SHA256 {
       .digest(bytes)
       .map("%02x".format(_))
       .mkString
+}
+
+@Singleton
+class UpscanCacheScheduler @Inject() (
+  actorSystem: ActorSystem
+)(implicit
+  ec: ExecutionContext
+) {
+
+  actorSystem.scheduler.scheduleAtFixedRate(initialDelay = 1.minute, interval = 1.day) { () =>
+    actorSystem.log.info(
+      s"Cleaning up upscan stub cache. ${UpscanController.upscanInitiateRequestCache.size()} files before cleanup."
+    )
+    UpscanController.upscanInitiateRequestCache.entrySet().forEach { entry =>
+      if (entry.getValue.createdAt.isBefore(LocalDateTime.now().minusDays(1))) {
+        val upscanReference = entry.getKey()
+        UpscanController.upscanInitiateRequestCache.remove(upscanReference)
+        Option(UpscanController.fileUploadsCache.remove(upscanReference)).foreach { fileRef =>
+          try fileRef.delete()
+          catch {
+            case e: Exception =>
+              actorSystem.log.error(s"Error deleting file ${fileRef.path}", e)
+          }
+        }
+      }
+    }
+    actorSystem.log.info(
+      s"Cleaning upscan stub cache completed. ${UpscanController.upscanInitiateRequestCache.size()} files remaining after cleanup."
+    )
+  }
 }

@@ -61,6 +61,7 @@ class UpscanInternalController @Inject() (
             "error_action_redirect": "${upscanInitiateRequest.errorRedirect}",
             "x-amz-meta-upscan-initiate-response": "dummy",
             "x-amz-meta-upscan-initiate-received": "dummy",
+            "x-amz-meta-consuming-service": "${upscanInitiateRequest.consumingService.getOrElse("dummy")}",
             "x-amz-meta-request-id": "${UUID.randomUUID().toString()}",
             "x-amz-signature": "xyz",
             "x-amz-meta-session-id": "${UUID.randomUUID().toString()}",

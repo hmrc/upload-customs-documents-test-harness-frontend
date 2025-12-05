@@ -30,6 +30,8 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
 
   val host: String = servicesConfig.getString("host")
 
+  lazy val mongo_ttl: Int = config.get[Int]("mongodb.timeToLiveInSeconds")
+
   val uploadCustomsDocumentsDNS: String = servicesConfig.baseUrl("upload-customs-documents-frontend")
   val uploadDocumentsDNS: String        = servicesConfig.baseUrl("upload-documents-frontend")
   val hostDNS: String                   = servicesConfig.baseUrl("upload-customs-documents-test-harness-frontend")

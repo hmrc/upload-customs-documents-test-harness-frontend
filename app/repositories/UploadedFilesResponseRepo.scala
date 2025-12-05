@@ -16,6 +16,7 @@
 
 package repositories
 
+import config.AppConfig
 import models.UploadedFilesCallback
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
@@ -31,9 +32,10 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import javax.inject.Singleton
+import scala.concurrent.duration.SECONDS
 
 @Singleton
-class UploadedFilesResponseRepo @Inject() (mongo: MongoComponent)(implicit ec: ExecutionContext)
+class UploadedFilesResponseRepo @Inject()(mongo: MongoComponent, appConfig: AppConfig)(implicit ec: ExecutionContext)
     extends PlayMongoRepository[UploadedFilesCallback](
       collectionName = "file-upload-callback",
       mongoComponent = mongo,
@@ -43,6 +45,7 @@ class UploadedFilesResponseRepo @Inject() (mongo: MongoComponent)(implicit ec: E
           keys = ascending("nonce"),
           indexOptions = IndexOptions()
             .name("nonce-Unique-Index")
+            .expireAfter(appConfig.mongo_ttl.toLong, SECONDS)
             .unique(true)
             .sparse(false)
         )

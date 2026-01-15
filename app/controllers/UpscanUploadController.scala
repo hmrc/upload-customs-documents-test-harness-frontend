@@ -52,7 +52,6 @@ class UpscanUploadController @Inject() (
     body.dataParts
       .get("key")
       .map { upscanReferences =>
-        println("upscanReferences: " + upscanReferences)
         upscanReferences.headOption.match {
           case None                  => BadRequest
           case Some(upscanReference) =>
@@ -64,8 +63,7 @@ class UpscanUploadController @Inject() (
                   case Some(upscanInitiateRequest) =>
                     UpscanController.fileUploadsCache.put(upscanReference, file.ref)
                     Future {
-                      Thread.sleep(5000)
-                      println("filename: " + file.filename)
+                      Thread.sleep(1000)
                       file.filename.match {
                         case "TestPicture.png"       =>
                           sendRejectedTooLargeResponse(upscanInitiateRequest, upscanReference, file)
@@ -89,9 +87,8 @@ class UpscanUploadController @Inject() (
                 Option(UpscanController.upscanInitiateRequestCache.get(upscanReference)).match {
                   case None                        => BadRequest
                   case Some(upscanInitiateRequest) =>
-                    println("no file found")
                     Future {
-                      Thread.sleep(5000)
+                      Thread.sleep(1000)
                       sendInvalidArgumentResponse(upscanInitiateRequest, upscanReference)
                     }
                     Redirect(Call("GET", upscanInitiateRequest.successRedirect + s"?key=$upscanReference"))

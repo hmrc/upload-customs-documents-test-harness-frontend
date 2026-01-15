@@ -16,6 +16,7 @@
 
 package controllers
 
+import controllers.UpscanController.UpscanInitiateRequest
 import org.apache.pekko.actor.ActorSystem
 import play.api.Configuration
 import play.api.libs.Files
@@ -51,6 +52,7 @@ class UpscanUploadController @Inject() (
     body.dataParts
       .get("key")
       .map { upscanReferences =>
+        println("upscanReferences: " + upscanReferences)
         upscanReferences.headOption.match {
           case None                  => BadRequest
           case Some(upscanReference) =>
@@ -62,34 +64,18 @@ class UpscanUploadController @Inject() (
                   case Some(upscanInitiateRequest) =>
                     UpscanController.fileUploadsCache.put(upscanReference, file.ref)
                     Future {
-                      Thread.sleep(1000)
-                      wsClient
-                        .url(upscanInitiateRequest.callbackUrl)
-                        .withMethod("POST")
-                        .withHttpHeaders(
-                          "Content-Type" -> "application/json"
-                        )
-                        .withBody(
-                          Json.prettyPrint(
-                            Json.obj(
-                              "reference"     -> JsString(upscanReference),
-                              "fileStatus"    -> JsString("READY"),
-                              "downloadUrl"   -> JsString(
-                                downloadFileBaseUrl + routes.UpscanUploadController.download(upscanReference).url
-                              ),
-                              "uploadDetails" -> Json.obj(
-                                "uploadTimestamp" -> JsString(
-                                  LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z"
-                                ),
-                                "checksum"        -> JsString(SHA256(file.transformRefToBytes().toByteBuffer.array())),
-                                "fileName"        -> JsString(file.filename),
-                                "fileMimeType"    -> JsString(file.contentType.getOrElse("application/octet-stream")),
-                                "size"            -> JsNumber(file.fileSize)
-                              )
-                            )
-                          )
-                        )
-                        .execute()
+                      Thread.sleep(5000)
+                      println("filename: " + file.filename)
+                      file.filename.match {
+                        case "TestPicture.png"       =>
+                          sendRejectedTooLargeResponse(upscanInitiateRequest, upscanReference, file)
+                        case "fakeVirusTestFile.png" =>
+                          sendRejectedVirusResponse(upscanInitiateRequest, upscanReference)
+                        case "empty.png"             =>
+                          sendInvalidArgumentResponse(upscanInitiateRequest, upscanReference)
+                        case _                       =>
+                          sendDefaultResponse(upscanInitiateRequest, upscanReference, file)
+                      }
                     }
                     Redirect(
                       Call(
@@ -103,7 +89,12 @@ class UpscanUploadController @Inject() (
                 Option(UpscanController.upscanInitiateRequestCache.get(upscanReference)).match {
                   case None                        => BadRequest
                   case Some(upscanInitiateRequest) =>
-                    Redirect(Call("GET", upscanInitiateRequest.errorRedirect + s"?key=$upscanReference"))
+                    println("no file found")
+                    Future {
+                      Thread.sleep(5000)
+                      sendInvalidArgumentResponse(upscanInitiateRequest, upscanReference)
+                    }
+                    Redirect(Call("GET", upscanInitiateRequest.successRedirect + s"?key=$upscanReference"))
                 }
               )
         }
@@ -119,6 +110,102 @@ class UpscanUploadController @Inject() (
           Ok(java.nio.file.Files.readAllBytes(fileRef.path))
       }
     }
+
+  private def sendRejectedTooLargeResponse(
+    upscanInitiateRequest: UpscanInitiateRequest,
+    upscanReference: String,
+    file: MultipartFormData.FilePart[TemporaryFile]
+  ): Unit =
+    wsClient
+      .url(upscanInitiateRequest.errorRedirect)
+      .withMethod("GET")
+      .withHttpHeaders(
+        "Content-Type" -> "application/json"
+      )
+      .withQueryStringParameters(
+        "errorMessage"   -> "Your proposed upload exceeds the maximum allowed size",
+        "key"            -> s"$upscanReference",
+        "errorCode"      -> "EntityTooLarge",
+        "errorRequestId" -> "SomeRequestId",
+        "errorResource"  -> s"${file.ref}"
+      )
+      .execute()
+
+  private def sendInvalidArgumentResponse(
+    upscanInitiateRequest: UpscanInitiateRequest,
+    upscanReference: String
+  ): Unit =
+    wsClient
+      .url(upscanInitiateRequest.errorRedirect)
+      .withMethod("GET")
+      .withHttpHeaders(
+        "Content-Type" -> "application/json"
+      )
+      .withQueryStringParameters(
+        "errorMessage"   -> "'file' field not found",
+        "key"            -> s"$upscanReference",
+        "errorCode"      -> "InvalidArgument",
+        "errorRequestId" -> "SomeRequestId",
+        "errorResource"  -> s"NoFileReference"
+      )
+      .execute()
+
+  private def sendRejectedVirusResponse(
+    upscanInitiateRequest: UpscanInitiateRequest,
+    upscanReference: String
+  ): Unit =
+    wsClient
+      .url(upscanInitiateRequest.callbackUrl)
+      .withMethod("POST")
+      .withHttpHeaders(
+        "Content-Type" -> "application/json"
+      )
+      .withBody(
+        Json.prettyPrint(
+          Json.obj(
+            "reference"      -> JsString(upscanReference),
+            "fileStatus"     -> JsString("FAILED"),
+            "failureDetails" -> Json.obj(
+              "failureReason" -> "QUARANTINE",
+              "message"       -> "Eicar-Test-Signature"
+            )
+          )
+        )
+      )
+      .execute()
+
+  private def sendDefaultResponse(
+    upscanInitiateRequest: UpscanInitiateRequest,
+    upscanReference: String,
+    file: MultipartFormData.FilePart[TemporaryFile]
+  ): Unit =
+    wsClient
+      .url(upscanInitiateRequest.callbackUrl)
+      .withMethod("POST")
+      .withHttpHeaders(
+        "Content-Type" -> "application/json"
+      )
+      .withBody(
+        Json.prettyPrint(
+          Json.obj(
+            "reference"     -> JsString(upscanReference),
+            "fileStatus"    -> JsString("READY"),
+            "downloadUrl"   -> JsString(
+              downloadFileBaseUrl + routes.UpscanUploadController.download(upscanReference).url
+            ),
+            "uploadDetails" -> Json.obj(
+              "uploadTimestamp" -> JsString(
+                LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z"
+              ),
+              "checksum"        -> JsString(SHA256(file.transformRefToBytes().toByteBuffer.array())),
+              "fileName"        -> JsString(file.filename),
+              "fileMimeType"    -> JsString(file.contentType.getOrElse("application/octet-stream")),
+              "size"            -> JsNumber(file.fileSize)
+            )
+          )
+        )
+      )
+      .execute()
 
 }
 

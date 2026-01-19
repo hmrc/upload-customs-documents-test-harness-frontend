@@ -65,7 +65,7 @@ class UpscanUploadController @Inject() (
                     Future {
                       Thread.sleep(1000)
                       file.filename.match {
-                        case "TestPicture.png"       =>
+                        case "TestPictureLarge.png"  =>
                           sendRejectedTooLargeResponse(upscanInitiateRequest, upscanReference, file)
                         case "fakeVirusTestFile.png" =>
                           sendRejectedVirusResponse(upscanInitiateRequest, upscanReference)

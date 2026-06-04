@@ -4,15 +4,16 @@ resolvers += Resolver.url("HMRC-open-artefacts-ivy", url("https://open.artefacts
 )
 resolvers += Resolver.typesafeRepo("releases")
 
-libraryDependencies += "org.scalameta" %% "scalameta" % "4.12.3"
+libraryDependencies += "org.scalameta" %% "scalameta" % "4.17.0"
 
 ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
 
 addSbtPlugin("uk.gov.hmrc"       % "sbt-auto-build"     % "3.24.0")
 addSbtPlugin("uk.gov.hmrc"       % "sbt-distributables" % "2.6.0")
-addSbtPlugin("org.playframework" % "sbt-plugin"         % "3.0.9")
+addSbtPlugin("org.playframework" % "sbt-plugin"         % "3.0.10")
 addSbtPlugin("uk.gov.hmrc"       % "sbt-sass-compiler"  % "0.12.0")
 addSbtPlugin("org.scalameta"     % "sbt-scalafmt"       % "2.5.4")
 addSbtPlugin("org.scoverage"     % "sbt-scoverage"      % "2.4.0")
 addSbtPlugin("ch.epfl.scala"     % "sbt-scalafix"       % "0.13.0")
 addSbtPlugin("com.github.sbt"    % "sbt-uglify"         % "3.0.1")
+addSbtPlugin("com.timushev.sbt"  % "sbt-updates"        % "0.6.3")
